@@ -1,0 +1,36 @@
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_system_basics_memory": {
+            "check_command": "system_basics_memory",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_memory",
+            "object_type": "template",
+            "vars": {
+                "system_basics_memory_percentage_in_perfdata": "true",
+                "perfdatagraphs_config_highlight": "free_memory_percentage",
+                "perfdatagraphs_metrics": {
+                    "free_memory_percentage": {
+                        "unit": "%"
+                    },
+                    "available_memory_percentage": {
+                        "unit": "%"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_system_basics_load": {
+            "check_command": "system_basics_load",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_load",
+            "object_type": "template",
+            "vars": {}
+        },
+        "perfdatagraphs_system_basics_netdev": {
+            "check_command": "system_basics_netdev",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_netdev",
+            "object_type": "template",
+            "vars": {}
+        }
+    }
+}
