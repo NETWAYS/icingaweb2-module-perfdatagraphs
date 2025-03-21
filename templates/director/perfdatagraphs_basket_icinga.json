@@ -1,0 +1,57 @@
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_icingadb": {
+            "check_command": "icingadb",
+            "fields": [],
+            "object_name": "perfdatagraphs_icingadb",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "icingadb_last_full_sync_duration",
+                "perfdatagraphs_config_metrics_include": [
+                    "icinga*_last_full_*_duration",
+                    "icinga*_backlog"
+                ],
+                "perfdatagraphs_metrics": {
+                    "icinga2_last_full_dump_duration": {
+                        "unit": "ms"
+                    },
+                    "icinga2_redis_query_backlog": {
+                        "unit": "s"
+                    },
+                    "icingadb_history_backlog": {
+                        "unit": "s"
+                    },
+                    "icingadb_last_full_sync_duration": {
+                        "unit": "ms"
+                    },
+                    "icingadb_runtime_backlog": {
+                        "unit": "s"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_cluster-zone": {
+            "check_command": "cluster-zone",
+            "fields": [],
+            "object_name": "perfdatagraphs_cluster-zone",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "slave_lag",
+                "perfdatagraphs_metrics": {
+                    "slave_lag": {
+                        "unit": "ms"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_cluster": {
+            "check_command": "cluster",
+            "fields": [],
+            "object_name": "perfdatagraphs_cluster",
+            "object_type": "template",
+            "vars": {
+              "perfdatagraphs_config_metrics_include": ["*rate"]
+            }
+        }
+    }
+}

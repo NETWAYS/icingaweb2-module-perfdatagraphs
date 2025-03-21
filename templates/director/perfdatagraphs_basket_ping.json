@@ -1,0 +1,57 @@
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_ping4": {
+            "check_command": "ping4",
+            "fields": [],
+            "object_name": "perfdatagraphs_ping4",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "%"
+                    },
+                    "rta": {
+                        "unit": "ms"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_ping6": {
+            "check_command": "ping6",
+            "fields": [],
+            "object_name": "perfdatagraphs_ping6",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "%"
+                    },
+                    "rta": {
+                        "unit": "ms"
+                    }
+                }
+            }
+        }
+    },
+    "HostTemplate": {
+        "perfdatagraphs_hostalive": {
+            "check_command": "hostalive",
+            "fields": [],
+            "object_name": "perfdatagraphs_hostalive",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "%"
+                    },
+                    "rta": {
+                        "unit": "ms"
+                    }
+                }
+            }
+        }
+    }
+}
