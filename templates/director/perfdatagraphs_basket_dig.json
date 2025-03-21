@@ -1,0 +1,18 @@
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_dig": {
+            "check_command": "dig",
+            "fields": [],
+            "object_name": "perfdatagraphs_dig",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "time",
+                "perfdatagraphs_metrics": {
+                    "time": {
+                        "unit": "s"
+                    }
+                }
+            }
+        }
+    }
+}
