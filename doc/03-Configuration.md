@@ -115,10 +115,9 @@ apply Service "icinga" {
 
 Custom variables as dictionaries aren't available as in the DSL, thus to provide customvars for specific graphs you need to use the Director baskets.
 
-The module provides a few basic baskets to change the behaviour of graphs. These can be found in `templates/director`. 
+The graphs module provides a few basic baskets to change the behaviour of graphs, those can be found in `templates/director`. 
 
 Syntax of those baskets are pretty straight forward and can therefore be easily modified if needed. 
-
 Copy the following example into a file, change the variables and names to your liking and import them via baskets. 
 
 ```
