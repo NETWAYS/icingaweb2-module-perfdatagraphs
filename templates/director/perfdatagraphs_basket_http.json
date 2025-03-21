@@ -1,0 +1,21 @@
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_http": {
+            "check_command": "http",
+            "fields": [],
+            "object_name": "perfdatagraphs_http",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "time",
+                "perfdatagraphs_metrics": {
+                    "time": {
+                        "unit": "Seconds"
+                    },
+                    "size": {
+                        "unit": "Byte"
+                    }
+                }
+            }
+        }
+    }
+}
