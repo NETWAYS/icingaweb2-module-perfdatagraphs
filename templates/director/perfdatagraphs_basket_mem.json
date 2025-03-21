@@ -1,0 +1,21 @@
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_mem": {
+            "check_command": "mem",
+            "fields": [],
+            "object_name": "perfdatagraphs_mem",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "USED",
+                "perfdatagraphs_metrics": {
+                    "USED": {
+                        "unit": "kb"
+                    },
+                    "FREE": {
+                        "unit": "kb"
+                    }
+                }
+            }
+        }
+    }
+}
