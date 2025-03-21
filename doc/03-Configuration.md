@@ -113,48 +113,34 @@ apply Service "icinga" {
 
 ## Director Integration
 
-Custom variables as dictionaries aren't available as in the DSL, thus to provide customvars for specific graphs you need to use the Director automation.
+Custom variables as dictionaries aren't available as in the DSL, thus to provide customvars for specific graphs you need to use the Director baskets.
 
-We assume graph customization isn't done regularly, thus we use the Director's automation process.
+The module provides a few basic baskets to change the behaviour of graphs. These can be found in `templates/director`. 
 
-#### CSV Import
+Syntax of those baskets are pretty straight forward and can therefore be easily modified if needed. 
 
-To proceed have the Fileshipper Module installed and configured. [Fileshipper](https://github.com/Icinga/icingaweb2-module-fileshipper)
-
-Please add a CSV file to your imports path with the following values. You can tweak and add dictionaries in the settings column.
+Copy the following example into a file, change the variables and names to your liking and import them via baskets. 
 
 ```
-object;template;command;settings
-service;perfdatagraphs;icingadb;{}
-service;perfdatagraphs;cluster-zone;{}
-service;perfdatagraphs;cluster;{}
-service;perfdatagraphs;icinga;{"perfdatagraphs_config_metrics_exclude":["uptime","num_hosts*","num_services*"]}
-service;perfdatagraphs;mem;{"perfdatagraphs_config_metrics_exclude":["TOTAL"],"perfdatagraphs_metrics":{"USED":{"unit":"kb"}}}
-service;perfdatagraphs;ping4;{"perfdatagraphs_metrics":{"pl":{"unit":"%"},"rta":{"unit":"ms"}}}
-service;perfdatagraphs;ping6;{"perfdatagraphs_metrics":{"pl":{"unit":"%"},"rta":{"unit":"ms"}}}
-host;perfdatagraphs;hostalive;{"perfdatagraphs_metrics":{"pl":{"unit":"%"},"rta":{"unit":"ms"}}}
+{
+    "ServiceTemplate": {
+        "perfdatagraphs_ping4": {
+            "check_command": "ping4",
+            "fields": [],
+            "object_name": "perfdatagraphs_ping4",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "%"
+                    },
+                    "rta": {
+                        "unit": "ms"
+                    }
+                }
+            }
+        }
+    }
+}
 ```
-
-#### Import
-
-Add an import and import the created CSV file. And add two modifiers, one to decode the settings to a JSON and a second to combine the template with a command, which will be the name of the template.
-
-![screenshot_import](_images/screenshot_import_modifiers.png)
-
-![screenshot_import](_images/screenshot_import_modifiers_combine.png)
-
-#### Sync
-
-Afterwards you can add a sync rule which creates service templates with the dictionaries provided by the CSV.
-
-![screenshot_import](_images/screenshot_sync_settings.png)
-
-![screenshot_import](_images/screenshot_sync_properties.png)
-
-#### Templates
-
-After the sync observe the dictionaries visible in the preview section. You cannot edit the dictionaries in the templates but in the CSV.
-
-![screenshot_import](_images/screenshot_service1.png)
-
-![screenshot_import](_images/screenshot_service2.png)
