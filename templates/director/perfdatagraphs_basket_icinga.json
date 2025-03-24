@@ -30,6 +30,21 @@
                 }
             }
         },
+        "perfdatagraphs_icinga": {
+            "check_command": "icinga",
+            "fields": [],
+            "object_name": "perfdatagraphs_icinga",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "avg_execution_time",
+                "perfdatagraphs_config_metrics_exclude": [ "num_hosts*", "num_services*" ],
+                "perfdatagraphs_config_metrics_include": [
+                    "avg_execution_time",
+                    "avg_latency",
+                    "*work_queue_item_rate"
+                ]
+            }
+        },
         "perfdatagraphs_cluster-zone": {
             "check_command": "cluster-zone",
             "fields": [],
