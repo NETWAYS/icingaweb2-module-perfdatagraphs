@@ -12,8 +12,7 @@
     // Endpoint to fetch the data from
     const FETCH_ENDPOINT = '/perfdatagraphs/fetch';
     // Timeout for the data fetch
-    // TODO: Can be make this configurable?
-    const FETCH_TIMEOUT = 15000;
+    const FETCH_TIMEOUT = 15000;  // TODO: Can we make this configurable somehow?
 
     class Perfdatagraphs extends Icinga.EventListener {
         // data contains the fetched chart data with the element ID where it is rendered as key.
@@ -102,62 +101,6 @@
             // Now we fetch and render
             _this.fetchData();
             _this.renderCharts();
-        }
-
-
-        /**
-         * formatNumber returns exponential format for too low/high numbers
-         */
-        formatNumber(n)
-        {
-            if (n == 0) {
-                return 0;
-            }
-
-            const str = n.toString();
-
-            // If the output would be too long we change to exponential
-            if (str.length >= 20) {
-                return n.toExponential();
-            }
-
-            return str;
-        }
-
-        /**
-         * ensureArray ensures the given object is an Array.
-         * It will transform Objects if possible.
-         * A dirty PHP 8.0 hack since I sometimes used SplFixedArray.
-         * Can be removed once PHP 8.0 is ancient history.
-         */
-        ensureArray(obj) {
-            if (typeof obj === 'object' && !Array.isArray(obj)) {
-                return Object.values(obj);
-            }
-
-            return obj;
-        }
-
-        /**
-         * Translate a given rgb() string into rgba().
-         * Used for the fill of the chart.
-         */
-        ensureRgba(color, alpha=1) {
-            // If already in rgba just return.
-            if (color.startsWith('rgba')) {
-                return color;
-            }
-
-            // Try to match the rgb format and return with alpha.
-            const rgbMatch = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-            if (!rgbMatch) {
-                // If we match nothing return what was given just to be safe.
-                return color;
-            }
-
-            // Add the given alpha.
-            const [_, r, g, b] = rgbMatch;
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
 
         /**
@@ -275,26 +218,33 @@
                 width: width - 10,
                 // If you change this, remember to also change the collapsible height.
                 height: 200,
-            }
+            };
         }
 
         /**
-         * getChartOptions returns shared options for all charts.
+         * getXProperty returns the properties for the x-axis.
+         * Decided to make this a method to have future customization options.
          */
-        getChartOptions(axesColor)
+        getXProperty(axesColor)
         {
-            // Properties for the x and y axes
-            const xProperty = {
+            return {
                 stroke: axesColor,
                 grid: { stroke: axesColor, width: 0.5 },
                 ticks: { stroke: axesColor, width: 0.5 }
-            }
+            };
+        }
 
-            const yProperty = {
+        /**
+         * getYProperty returns the properties for the y-axis.
+         * Decided to make this a method to have future customization options.
+         */
+        getYProperty(axesColor, formatFunction)
+        {
+            return {
                 stroke: axesColor,
+                values: formatFunction,
                 grid: { stroke: axesColor, width: 0.5 },
                 ticks: { stroke: axesColor, width: 0.5 },
-                values: (u, vals, space) => vals.map(v => this.formatNumber(v)),
                 size(self, values, axisIdx, cycleNum) {
                     // We calculate the size of the axis based on the width of the elements
                     let axis = self.axes[axisIdx];
@@ -315,14 +265,20 @@
 
                     return Math.ceil(axisSize);
                 },
-            }
+            };
+        }
 
+        /**
+         * getChartOptions returns shared base options for all charts.
+         * These will get merged with individual options (e.g. axes config).
+         */
+        getChartBaseOptions()
+        {
             // The shared options for each chart. These
             // can then be combined with individual options e.g. the width.
             const opts = {
                 cursor: { sync: { key: 0, setSeries: true } },
                 scales: { x: { time: true } },
-                axes: [ xProperty, yProperty ],
                 // series holds the config of each dataset, such as visibility, styling,
                 // labels & value display in the legend
                 series: [ {} ],
@@ -377,8 +333,8 @@
             const warningColor = $('div.warning-color').css('background-color');
             const criticalColor = $('div.critical-color').css('background-color');
             const valueColor = $('div.value-color').css('background-color');
-
-            const sharedOpts = this.getChartOptions(axesColor);
+            // These are the shared options for all charts
+            const baseOpts = this.getChartBaseOptions();
 
             // Reset the existing plots map for the new rendering
             this.plots = new Map();
@@ -401,7 +357,7 @@
 
                 // The size can vary from chart to chart for example when
                 // there are two contains on the page.
-                let opts = {...sharedOpts, ...this.getChartSize(elem.offsetWidth)};
+                let opts = {...baseOpts, ...this.getChartSize(elem.offsetWidth)};
 
                 // Add each element to the resize observer so that we can
                 // resize the chart when its container changes
@@ -413,10 +369,32 @@
                 // Create a new uplot chart for each performance dataset
                 data.forEach((dataset) => {
                     dataset.timestamps = this.ensureArray(dataset.timestamps);
+                    // Base format function for the y-axis
+                    let formatFunction = (u, vals, space) => vals.map(v => this.formatNumber(v));
+
+                    // We change the format function based on the unit of the dataset
+                    // This can be extend in the future:
+                    // - Create a new format function that returns a formated string for the given value
+                    // - Add a new case with the function here
+                    // - Update the documentation to include the new format option
+                    switch (dataset.unit) {
+                    case 'bytes':
+                        formatFunction = (u, vals, space) => vals.map(v => this.formatBytesSI(v));
+                        break;
+                    case 'seconds':
+                        formatFunction = (u, vals, space) => vals.map(v => this.formatTimeSeconds(v));
+                        break;
+                    case 'percentage':
+                        formatFunction = (u, vals, space) => vals.map(v => this.formatPercentage(v));
+                        break;
+                    }
+
+                    opts.axes = [this.getXProperty(axesColor), this.getYProperty(axesColor, formatFunction)];
 
                     // Add a new empty plot with a title for the dataset
                     opts.title = dataset.title;
                     opts.title += dataset.unit ? ' | ' + dataset.unit : '';
+
                     let u = new uPlot(opts, [], elem);
                     // Where we store the finished data for the chart
                     let d = [dataset.timestamps];
@@ -478,6 +456,140 @@
                 });
             });
             this.icinga.logger.debug('perfdatagraphs', 'finish renderCharts', this.plots);
+        }
+
+        /**
+         * ensureArray ensures the given object is an Array.
+         * It will transform Objects if possible.
+         * A dirty PHP 8.0 hack since I sometimes used SplFixedArray.
+         * Can be removed once PHP 8.0 is ancient history.
+         */
+        ensureArray(obj) {
+            if (typeof obj === 'object' && !Array.isArray(obj)) {
+                return Object.values(obj);
+            }
+
+            return obj;
+        }
+
+        /**
+         * Translate a given rgb() string into rgba().
+         * Used for the fill of the chart.
+         */
+        ensureRgba(color, alpha=1) {
+            // If already in rgba just return.
+            if (color.startsWith('rgba')) {
+                return color;
+            }
+
+            // Try to match the rgb format and return with alpha.
+            const rgbMatch = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (!rgbMatch) {
+                // If we match nothing return what was given just to be safe.
+                return color;
+            }
+
+            // Add the given alpha.
+            const [_, r, g, b] = rgbMatch;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        /**
+         * formatNumber returns exponential format for too low/high numbers, so that the y-axis does not grow endlessly.
+         */
+        formatNumber(n)
+        {
+            if (n == 0) {
+                return 0;
+            }
+
+            const str = n.toString();
+
+            // If the output would be too long we change to exponential
+            if (str.length >= 20) {
+                return n.toExponential();
+            }
+
+            return str;
+        }
+
+        /**
+         * formatPercentage returns the given value with % attached.
+         */
+        formatPercentage(n)
+        {
+            if (n == 0) {
+                return "0.00%";
+            }
+
+            let value = n;
+            return `${value.toFixed(2)}%`;
+        }
+
+        /**
+         * formatSeconds turns the number of seconds into a time format
+         * TODO: Maybe we should have a helper function that calculates the
+         * required number of decimals. Because fixed decimals may not
+         * help to distinquish certains values.
+         */
+        formatTimeSeconds(n)
+        {
+            if (n == 0) {
+                return "0 s";
+            }
+
+            let value = n;
+
+            if (Math.abs(n) < 0.000001) {
+                value = n * 1e9
+                return `${value.toFixed(2)} ns`;
+            }
+
+            if (Math.abs(n) < 0.001) {
+                value = n * 1e6
+                return `${value.toFixed(2)} µs`;
+            }
+
+            if (Math.abs(n) < 1) {
+                value = n * 1e3
+                return `${value.toFixed(2)} ms`;
+            }
+
+            // TODO: Plurals could maybe be conditional
+            if (Math.abs(n) < 60) {
+                return `${value.toFixed(2)} s`;
+            }  else if (Math.abs(n) < 3600) {
+                value = n / 60
+                return `${value.toFixed(2)} mins`;
+            } else if (Math.abs(n) < 86400) {
+                value = n / 3600
+                return `${value.toFixed(2)} hours`;
+            } else if (Math.abs(n) < 604800) {
+                value = n / 86400
+                return `${value.toFixed(2)} days`;
+            } else if (Math.abs(n) < 31536000) {
+                value = n / 604800
+                return `${value.toFixed(2)} weeks`;
+            }
+        }
+
+        /**
+         * formatBytesSI turns a number of bytes into their SI format.
+         */
+        formatBytesSI(n)
+        {
+            if (n === 0) {
+                return "0 bytes";
+            }
+
+            const k = 1000;
+            const units = ["bytes", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+            const i = Math.floor(Math.log(n) / Math.log(k));
+
+            const num = n / Math.pow(k, i);
+            const value = num.toFixed(2);
+
+            return `${value} ${units[i]}`;
         }
     }
 

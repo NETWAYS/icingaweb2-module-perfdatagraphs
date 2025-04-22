@@ -54,5 +54,15 @@ would have increased the complexity of the code base. Thus, we decided to use di
 
 ### Y-axis units
 
-Too high or low values for the y-axis are automatically transformed into exponential notation.
-This tries to be a "one-size-fits-all" solution since check plugin output can vary widely.
+Too high or low values for the y-axis are automatically transformed into exponential notation,
+otherwise the width of the axis would grow endlessly.
+
+Custom formats can be invoked by using `unit` for a metric:
+
+```
+vars.perfdatagraphs_metrics["disk"] = {
+  unit = "bytes"
+}
+```
+
+The configuration documentation shows all available units.
