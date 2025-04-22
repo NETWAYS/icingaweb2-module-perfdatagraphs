@@ -9,10 +9,10 @@
                 "perfdatagraphs_config_highlight": "time",
                 "perfdatagraphs_metrics": {
                     "time": {
-                        "unit": "Seconds"
+                        "unit": "seconds"
                     },
                     "size": {
-                        "unit": "Byte"
+                        "unit": "bytes"
                     }
                 }
             }

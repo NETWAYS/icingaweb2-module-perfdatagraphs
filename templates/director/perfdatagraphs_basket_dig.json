@@ -9,7 +9,7 @@
                 "perfdatagraphs_config_highlight": "time",
                 "perfdatagraphs_metrics": {
                     "time": {
-                        "unit": "s"
+                        "unit": "seconds"
                     }
                 }
             }

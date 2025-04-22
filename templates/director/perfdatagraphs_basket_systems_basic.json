@@ -10,10 +10,10 @@
                 "perfdatagraphs_config_highlight": "free_memory_percentage",
                 "perfdatagraphs_metrics": {
                     "free_memory_percentage": {
-                        "unit": "%"
+                        "unit": "percentage"
                     },
                     "available_memory_percentage": {
-                        "unit": "%"
+                        "unit": "percentage"
                     }
                 }
             }

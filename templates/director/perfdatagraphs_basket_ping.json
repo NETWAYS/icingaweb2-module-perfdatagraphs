@@ -9,10 +9,10 @@
                 "perfdatagraphs_config_highlight": "rta",
                 "perfdatagraphs_metrics": {
                     "pl": {
-                        "unit": "%"
+                        "unit": "percentage"
                     },
                     "rta": {
-                        "unit": "ms"
+                        "unit": "milliseconds"
                     }
                 }
             }
@@ -26,10 +26,10 @@
                 "perfdatagraphs_config_highlight": "rta",
                 "perfdatagraphs_metrics": {
                     "pl": {
-                        "unit": "%"
+                        "unit": "percentage"
                     },
                     "rta": {
-                        "unit": "ms"
+                        "unit": "milliseconds"
                     }
                 }
             }
@@ -45,10 +45,10 @@
                 "perfdatagraphs_config_highlight": "rta",
                 "perfdatagraphs_metrics": {
                     "pl": {
-                        "unit": "%"
+                        "unit": "percentage"
                     },
                     "rta": {
-                        "unit": "ms"
+                        "unit": "milliseconds"
                     }
                 }
             }

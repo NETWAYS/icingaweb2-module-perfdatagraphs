@@ -13,19 +13,19 @@
                 ],
                 "perfdatagraphs_metrics": {
                     "icinga2_last_full_dump_duration": {
-                        "unit": "ms"
+                        "unit": "milliseconds"
                     },
                     "icinga2_redis_query_backlog": {
-                        "unit": "s"
+                        "unit": "seconds"
                     },
                     "icingadb_history_backlog": {
-                        "unit": "s"
+                        "unit": "seconds"
                     },
                     "icingadb_last_full_sync_duration": {
-                        "unit": "ms"
+                        "unit": "milliseconds"
                     },
                     "icingadb_runtime_backlog": {
-                        "unit": "s"
+                        "unit": "seconds"
                     }
                 }
             }
@@ -54,7 +54,7 @@
                 "perfdatagraphs_config_highlight": "slave_lag",
                 "perfdatagraphs_metrics": {
                     "slave_lag": {
-                        "unit": "ms"
+                        "unit": "milliseconds"
                     }
                 }
             }
