@@ -384,6 +384,9 @@
                     case 'seconds':
                         formatFunction = (u, vals, space) => vals.map(v => this.formatTimeSeconds(v));
                         break;
+                    case 'milliseconds':
+                        formatFunction = (u, vals, space) => vals.map(v => this.formatTimeMilliSeconds(v));
+                        break;
                     case 'percentage':
                         formatFunction = (u, vals, space) => vals.map(v => this.formatPercentage(v));
                         break;
@@ -541,17 +544,17 @@
             let value = n;
 
             if (Math.abs(n) < 0.000001) {
-                value = n * 1e9
+                value = n * 1e9;
                 return `${value.toFixed(2)} ns`;
             }
 
             if (Math.abs(n) < 0.001) {
-                value = n * 1e6
+                value = n * 1e6;
                 return `${value.toFixed(2)} µs`;
             }
 
             if (Math.abs(n) < 1) {
-                value = n * 1e3
+                value = n * 1e3;
                 return `${value.toFixed(2)} ms`;
             }
 
@@ -559,18 +562,47 @@
             if (Math.abs(n) < 60) {
                 return `${value.toFixed(2)} s`;
             }  else if (Math.abs(n) < 3600) {
-                value = n / 60
+                value = n / 60;
                 return `${value.toFixed(2)} mins`;
             } else if (Math.abs(n) < 86400) {
-                value = n / 3600
+                value = n / 3600;
                 return `${value.toFixed(2)} hours`;
             } else if (Math.abs(n) < 604800) {
-                value = n / 86400
+                value = n / 86400;
                 return `${value.toFixed(2)} days`;
             } else if (Math.abs(n) < 31536000) {
-                value = n / 604800
+                value = n / 604800;
                 return `${value.toFixed(2)} weeks`;
             }
+        }
+
+        formatTimeMilliSeconds(n)
+        {
+            if (n == 0) {
+                return "0 ms";
+            }
+
+            let value = n;
+
+            if (Math.abs(n) < 1000) {
+                return `${value} ms`;
+            }  else if (Math.abs(n) < 3600) {
+                value = n / 1000;
+                return `${value.toFixed(2)} s`;
+            } else if (Math.abs(n) < 3600000) {
+                value = n / 60000;
+                return `${value.toFixed(2)} mins`;
+            } else if (Math.abs(n) < 86400000) {
+                value = n / 3600000;
+                return `${value.toFixed(2)} hours`;
+            } else if (Math.abs(n) < 31536000000) {
+                value = n / 86400000;
+                return `${value.toFixed(2)} days`;
+            }
+
+            value = n / 31536000000;
+
+            return `${value.toFixed(2)} years`;
         }
 
         /**

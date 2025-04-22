@@ -98,6 +98,7 @@ The `unit` option can be any string, however, some unit of measurement can be us
 
 - `unit = "bytes"`
 - `unit = "seconds"`
+- `unit = "milliseconds"`
 - `unit = "percentage"`
 
 ### perfdatagraphs_config_metrics_include/exclude
