@@ -384,9 +384,6 @@
                     case 'seconds':
                         formatFunction = (u, vals, space) => vals.map(v => this.formatTimeSeconds(v));
                         break;
-                    case 'milliseconds':
-                        formatFunction = (u, vals, space) => vals.map(v => this.formatTimeMilliSeconds(v));
-                        break;
                     case 'percentage':
                         formatFunction = (u, vals, space) => vals.map(v => this.formatPercentage(v));
                         break;
@@ -576,34 +573,35 @@
             }
         }
 
-        formatTimeMilliSeconds(n)
-        {
-            if (n == 0) {
-                return "0 ms";
-            }
+        // Disabled for now since Icinga normlized perfdata
+        // formatTimeMilliSeconds(n)
+        // {
+        //     if (n == 0) {
+        //         return "0 ms";
+        //     }
 
-            let value = n;
+        //     let value = n;
 
-            if (Math.abs(n) < 1000) {
-                return `${value} ms`;
-            }  else if (Math.abs(n) < 60000) {
-                value = n / 1000;
-                return `${value.toFixed(2)} s`;
-            } else if (Math.abs(n) < 3600000) {
-                value = n / 60000;
-                return `${value.toFixed(2)} mins`;
-            } else if (Math.abs(n) < 86400000) {
-                value = n / 3600000;
-                return `${value.toFixed(2)} hours`;
-            } else if (Math.abs(n) < 31536000000) {
-                value = n / 86400000;
-                return `${value.toFixed(2)} days`;
-            }
+        //     if (Math.abs(n) < 1000) {
+        //         return `${value} ms`;
+        //     }  else if (Math.abs(n) < 60000) {
+        //         value = n / 1000;
+        //         return `${value.toFixed(2)} s`;
+        //     } else if (Math.abs(n) < 3600000) {
+        //         value = n / 60000;
+        //         return `${value.toFixed(2)} mins`;
+        //     } else if (Math.abs(n) < 86400000) {
+        //         value = n / 3600000;
+        //         return `${value.toFixed(2)} hours`;
+        //     } else if (Math.abs(n) < 31536000000) {
+        //         value = n / 86400000;
+        //         return `${value.toFixed(2)} days`;
+        //     }
 
-            value = n / 31536000000;
+        //     value = n / 31536000000;
 
-            return `${value.toFixed(2)} years`;
-        }
+        //     return `${value.toFixed(2)} years`;
+        // }
 
         /**
          * formatBytesSI turns a number of bytes into their SI format.
