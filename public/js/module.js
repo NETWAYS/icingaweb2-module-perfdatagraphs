@@ -586,7 +586,7 @@
 
             if (Math.abs(n) < 1000) {
                 return `${value} ms`;
-            }  else if (Math.abs(n) < 3600) {
+            }  else if (Math.abs(n) < 60000) {
                 value = n / 1000;
                 return `${value.toFixed(2)} s`;
             } else if (Math.abs(n) < 3600000) {
