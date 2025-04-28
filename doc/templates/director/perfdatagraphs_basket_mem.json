@@ -6,13 +6,11 @@
             "object_name": "perfdatagraphs_mem",
             "object_type": "template",
             "vars": {
+                "mem_used": false,
                 "perfdatagraphs_config_highlight": "USED",
                 "perfdatagraphs_metrics": {
-                    "USED": {
-                        "unit": "kb"
-                    },
-                    "FREE": {
-                        "unit": "kb"
+                    "*": {
+                        "unit": "bytes"
                     }
                 }
             }
