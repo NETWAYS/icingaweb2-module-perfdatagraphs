@@ -39,7 +39,13 @@
             "fields": [],
             "object_name": "perfdatagraphs_system_basics_netdev",
             "object_type": "template",
-            "vars": {}
+            "vars": {
+                "perfdatagraphs_metrics": {
+                    "*_bytes": {
+                        "unit": "bytes"
+                    }
+                }
+            }
         }
     }
 }
