@@ -42,7 +42,15 @@
                     "avg_execution_time",
                     "avg_latency",
                     "*work_queue_item_rate"
-                ]
+                ],
+                "perfdatagraphs_metrics": {
+		    "avg_execution_time": {
+                        "unit": "seconds"
+                    },
+		    "avg_latency": {
+                      "unit": "seconds"
+                    }
+                }
             }
         },
         "perfdatagraphs_cluster-zone": {

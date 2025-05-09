@@ -1,0 +1,278 @@
+{
+    "HostTemplate": {
+        "perfdatagraphs_hostalive": {
+            "check_command": "hostalive",
+            "fields": [],
+            "object_name": "perfdatagraphs_hostalive",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "percentage"
+                    },
+                    "rta": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        }
+    },
+    "ServiceTemplate": {
+        "perfdatagraphs_dig": {
+            "check_command": "dig",
+            "fields": [],
+            "object_name": "perfdatagraphs_dig",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "time",
+                "perfdatagraphs_metrics": {
+                    "time": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_disk": {
+            "check_command": "disk",
+            "fields": [],
+            "object_name": "perfdatagraphs_disk",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_metrics": {
+                    "*": {
+                        "unit": "bytes"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_disk-windows": {
+            "check_command": "disk-windows",
+            "fields": [],
+            "object_name": "perfdatagraphs_disk-windows",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_metrics": {
+                    "*": {
+                        "unit": "bytes"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_http": {
+            "check_command": "http",
+            "fields": [],
+            "object_name": "perfdatagraphs_http",
+            "object_type": "template",
+
+            "vars": {
+                "perfdatagraphs_config_highlight": "time",
+                "perfdatagraphs_metrics": {
+                    "size": {
+                        "unit": "bytes"
+                    },
+                    "time": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_mem": {
+            "check_command": "mem",
+            "fields": [],
+            "object_name": "perfdatagraphs_mem",
+            "object_type": "template",
+
+            "vars": {
+                "mem_used": false,
+                "perfdatagraphs_config_highlight": "USED",
+                "perfdatagraphs_metrics": {
+                    "*": {
+                        "unit": "bytes"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_icingadb": {
+            "check_command": "icingadb",
+            "fields": [],
+            "object_name": "perfdatagraphs_icingadb",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "icingadb_last_full_sync_duration",
+                "perfdatagraphs_config_metrics_include": [
+                    "icinga*_last_full_*_duration",
+                    "icinga*_backlog"
+                ],
+                "perfdatagraphs_metrics": {
+                    "icinga2_last_full_dump_duration": {
+                        "unit": "seconds"
+                    },
+                    "icinga2_redis_query_backlog": {
+                        "unit": "seconds"
+                    },
+                    "icingadb_history_backlog": {
+                        "unit": "seconds"
+                    },
+                    "icingadb_last_full_sync_duration": {
+                        "unit": "seconds"
+                    },
+                    "icingadb_runtime_backlog": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_icinga": {
+            "check_command": "icinga",
+            "fields": [],
+            "object_name": "perfdatagraphs_icinga",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "avg_execution_time",
+                "perfdatagraphs_config_metrics_exclude": [
+                    "num_hosts*",
+                    "num_services*"
+                ],
+                "perfdatagraphs_config_metrics_include": [
+                    "avg_execution_time",
+                    "avg_latency",
+                    "*work_queue_item_rate"
+                ],
+                "perfdatagraphs_metrics": {
+                    "avg_execution_time": {
+                        "unit": "seconds"
+                    },
+                    "avg_latency": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_cluster-zone": {
+            "check_command": "cluster-zone",
+            "fields": [],
+            "object_name": "perfdatagraphs_cluster-zone",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "slave_lag",
+                "perfdatagraphs_metrics": {
+                    "slave_lag": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_cluster": {
+            "check_command": "cluster",
+            "fields": [],
+            "object_name": "perfdatagraphs_cluster",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_metrics_include": [
+                    "*rate"
+                ]
+            }
+        },
+        "perfdatagraphs_ping4": {
+            "check_command": "ping4",
+            "fields": [],
+            "object_name": "perfdatagraphs_ping4",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "percentage"
+                    },
+                    "rta": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_ping6": {
+            "check_command": "ping6",
+            "fields": [],
+            "object_name": "perfdatagraphs_ping6",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "rta",
+                "perfdatagraphs_metrics": {
+                    "pl": {
+                        "unit": "percentage"
+                    },
+                    "rta": {
+                        "unit": "seconds"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_system_basics_memory": {
+            "check_command": "system_basics_memory",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_memory",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_config_highlight": "free_memory_percentage",
+                "perfdatagraphs_metrics": {
+                    "available_memory": {
+                        "unit": "bytes"
+                    },
+                    "available_memory_percentage": {
+                        "unit": "percentage"
+                    },
+                    "free_memory": {
+                        "unit": "bytes"
+                    },
+                    "free_memory_percentage": {
+                        "unit": "percentage"
+                    },
+                    "used_memory": {
+                        "unit": "bytes"
+                    }
+                },
+                "system_basics_memory_percentage_in_perfdata": "true"
+            }
+        },
+        "perfdatagraphs_system_basics_load": {
+            "check_command": "system_basics_load",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_load",
+            "object_type": "template"
+
+        },
+        "perfdatagraphs_system_basics_filesystem": {
+            "check_command": "system_basics_filesystem",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_filesystem",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_metrics": {
+                    "*_free": {
+                        "unit": "bytes"
+                    },
+                    "*_percentage": {
+                        "unit": "percentage"
+                    },
+                    "*_used": {
+                        "unit": "bytes"
+                    }
+                }
+            }
+        },
+        "perfdatagraphs_system_basics_netdev": {
+            "check_command": "system_basics_netdev",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_netdev",
+            "object_type": "template",  
+            "vars": {
+                "perfdatagraphs_metrics": {
+                    "*_bytes": {
+                        "unit": "bytes"
+                    }
+                }
+            }
+        }
+    }
+}
