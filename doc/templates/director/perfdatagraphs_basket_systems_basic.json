@@ -34,6 +34,25 @@
             "object_type": "template",
             "vars": {}
         },
+        "perfdatagraphs_system_basics_filesystem": {
+            "check_command": "system_basics_filesystem",
+            "fields": [],
+            "object_name": "perfdatagraphs_system_basics_filesystem",
+            "object_type": "template",
+            "vars": {
+                "perfdatagraphs_metrics": {
+                    "*_free": {
+                        "unit": "bytes"
+                    },
+                    "*_used": {
+                        "unit": "bytes"
+                    },
+                    "*_percentage": {
+                        "unit": "percentage"
+                    }
+                }
+            }
+        },
         "perfdatagraphs_system_basics_netdev": {
             "check_command": "system_basics_netdev",
             "fields": [],
