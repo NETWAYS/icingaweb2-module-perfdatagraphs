@@ -4,11 +4,14 @@ namespace Icinga\Module\Perfdatagraphs\Common;
 
 use Icinga\Module\Perfdatagraphs\Widget\QuickActions;
 
-use ipl\Html\HtmlElement;
+use Icinga\Util\Json;
+
 use ipl\Html\Html;
+use ipl\Html\HtmlElement;
 use ipl\Html\ValidHtml;
-use ipl\Web\Widget\Icon;
 use ipl\I18n\Translation;
+use ipl\Web\Url;
+use ipl\Web\Widget\Icon;
 
 /**
  * PerfdataChart contains common functionality used for rendering the performance data charts.
@@ -16,6 +19,8 @@ use ipl\I18n\Translation;
 trait PerfdataChart
 {
     use Translation;
+    use PerfdataSource;
+
 
     /**
      * @param string $hostName Name of the host
@@ -72,9 +77,6 @@ trait PerfdataChart
         // Where we store all elements for the charts.
         $charts = HtmlElement::create('div', [
             'class' => 'perfdata-charts-container collapsible',
-            // Note: We could have a configuration option to change the
-            // "always collapsed" behaviour
-            'data-visible-height' => 0,
             'data-toggle-element' => '.perfdata-charts-container-control',
         ]);
 
@@ -94,37 +96,64 @@ trait PerfdataChart
 
         $chartsControl->add($b);
 
+        // Add a headline and all other elements to our element.
+        $header = Html::tag('h2', $this->translate('Performance Data Graph'));
+
+        $main->add($header);
+
+        // Load the module's configuration.
+        $config = ModuleConfig::getConfig();
+
+        $duration = $config['default_timerange'];
+
+        if (Url::fromRequest()->hasParam('perfdatagraphs.duration')) {
+            $duration = Url::fromRequest()->getParam('perfdatagraphs.duration');
+        }
+
+        // Fetch the perfdata for a given object via the hook.
+        $perfdata = $this->fetchDataViaHook($hostName, $serviceName, $checkCommandName, $duration, $isHostCheck);
+
+        if ($perfdata->isEmpty()) {
+            $main->add(HtmlElement::create(
+                'p',
+                ['class' => 'line-chart-error preformatted'],
+                $this->translate('No data received')
+            ));
+
+            return $main;
+        }
+
+
+        if ($perfdata->hasErrors()) {
+            $main->add(HtmlElement::create(
+                'p',
+                ['class' => 'line-chart-error preformatted'],
+                $this->translate(sprintf('Error while fetching performance data: %s'), join(' ', $perfdata->errors))
+            ));
+
+            return $main;
+        }
+
+        if (!$perfdata->isValid()) {
+            $main->add(HtmlElement::create(
+                'p',
+                ['class' => 'line-chart-error preformatted'],
+                $this->translate(sprintf('Invalid data received: %s'), join(' ', $perfdata->errors))
+            ));
+            return $main;
+        }
+
         // Element in which the charts will get rendered.
         // We use attributes on this elements to transport data
         // to the JavaScript part of this module.
         $chart = HtmlElement::create('div', [
             'id' => $elemID,
             'class' => 'line-chart',
-            'data-host' => $hostName,
-            'data-ishostcheck' => $isHostCheck ? 'true': 'false',
-            'data-service' => $serviceName,
-            'data-checkcommand' => $checkCommandName,
+            'data-perfdata' => Json::sanitize($perfdata),
         ]);
 
-        // This element can be used to show error messages when fetching data fails.
-        $error = HtmlElement::create('p', [
-            'class' => 'line-chart-error preformatted',
-            'data-message-nodata' => $this->translate('No data received'),
-            'data-message-error' => $this->translate('Error while fetching performance data'),
-        ]);
-
-        $config = ModuleConfig::getConfig();
-
-        // Add a headline and all other elements to our element.
-        $header = Html::tag('h2', $this->translate('Performance Data Graph'));
-        $header->add(new Icon('spinner', ['class' => 'spinner']));
-
-        $main->add($header);
-        $main->add($error);
-
-        $charts->add((new QuickActions($config['default_timerange'])));
+        $charts->add((new QuickActions(Url::fromRequest(), $config['default_timerange'])));
         $charts->add($chart);
-
         $main->add($charts);
         $main->add($chartsControl);
 
