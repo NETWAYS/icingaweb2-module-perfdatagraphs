@@ -7,8 +7,6 @@
     // Names to identify the warning/critical series
     const CHART_WARN_SERIESNAME = 'warning';
     const CHART_CRIT_SERIESNAME = 'critical';
-    // Endpoint to fetch the data from
-    const FETCH_ENDPOINT = '/perfdatagraphs/fetch';
 
     class Perfdatagraphs extends Icinga.EventListener {
         // data contains the fetched chart data with the element ID where it is rendered as key.
@@ -84,7 +82,6 @@
             for (let elem of lineCharts) {
                 const perfdata =  JSON.parse(elem.getAttribute('data-perfdata'));
 
-                console.log(perfdata.data);
                 _this.data.set(elem.getAttribute('id'), perfdata.data);
                 _this.renderCharts();
             }
