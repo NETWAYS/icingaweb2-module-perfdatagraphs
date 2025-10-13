@@ -69,8 +69,8 @@ class PerfdataGraphsConfigForm extends ConfigForm
 
         $this->addElement('number', 'perfdatagraphs_cache_lifetime', [
             'label' => t('Cache lifetime in seconds'),
-            'description' => t('How long the data for the charts will be cached by the client.'),
-            'placeholder' => 360,
+            'description' => t('How long the data for the charts will be cached by the server.'),
+            'placeholder' => 900,
         ]);
 
         $backends = $this->listBackends();

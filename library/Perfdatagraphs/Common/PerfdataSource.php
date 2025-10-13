@@ -17,6 +17,7 @@ use Exception;
 
 /**
  * PerfdataSource contains everything related to fetching and transforming data.
+ * The idea is that you use this behind the scenes to get the data.
  */
 trait PerfdataSource
 {
@@ -36,8 +37,10 @@ trait PerfdataSource
     {
         $cache = PerfdataCache::instance('perfdatagraphs');
 
-        // TODO: Get this from the config
-        $cacheDurationInSeconds = 3600;
+        // Load the module's configuration.
+        $config = ModuleConfig::getConfig();
+
+        $cacheDurationInSeconds = $config['cache_lifetime'];
 
         $h = $isHostCheck ? 'true': 'false';
 

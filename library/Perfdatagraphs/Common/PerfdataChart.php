@@ -15,6 +15,7 @@ use ipl\Web\Widget\Icon;
 
 /**
  * PerfdataChart contains common functionality used for rendering the performance data charts.
+ * The idea is that you use this in the hook to create the chart elements.
  */
 trait PerfdataChart
 {

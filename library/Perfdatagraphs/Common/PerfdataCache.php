@@ -6,7 +6,7 @@ use Icinga\Web\FileCache;
 
 /**
 * Perfdata is a small wrapper around the FileCache
-* to provide additional features we require.
+* to provide additional features we might require.
 */
 class PerfdataCache extends FileCache
 {

@@ -74,7 +74,7 @@ class ModuleConfig
     public static function getConfig(Config $moduleConfig = null): array
     {
         $default = [
-            'cache_lifetime' => 360,
+            'cache_lifetime' => 900,
             'default_timerange' => 'PT12H',
         ];
 
