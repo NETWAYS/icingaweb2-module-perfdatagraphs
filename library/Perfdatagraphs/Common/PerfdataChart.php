@@ -107,6 +107,7 @@ trait PerfdataChart
 
         $duration = $config['default_timerange'];
 
+        // When there is a parameter for the duration we use that instead.
         if (Url::fromRequest()->hasParam('perfdatagraphs.duration')) {
             $duration = Url::fromRequest()->getParam('perfdatagraphs.duration');
         }
@@ -114,32 +115,34 @@ trait PerfdataChart
         // Fetch the perfdata for a given object via the hook.
         $perfdata = $this->fetchDataViaHook($hostName, $serviceName, $checkCommandName, $duration, $isHostCheck);
 
+        // Error handling, if this gets too long, we could move this to a method.
         if ($perfdata->isEmpty()) {
+            $msg = $this->translate('No data received');
             $main->add(HtmlElement::create(
                 'p',
                 ['class' => 'line-chart-error preformatted'],
-                $this->translate('No data received')
+                $msg,
             ));
-
             return $main;
         }
 
 
         if ($perfdata->hasErrors()) {
+            $msg = $this->translate('Error while fetching performance data: %s');
             $main->add(HtmlElement::create(
                 'p',
                 ['class' => 'line-chart-error preformatted'],
-                $this->translate(sprintf('Error while fetching performance data: %s'), join(' ', $perfdata->errors))
+                sprintf($msg, join(' ', $perfdata->errors)),
             ));
-
             return $main;
         }
 
         if (!$perfdata->isValid()) {
+            $msg = $this->translate('Invalid data received: %s');
             $main->add(HtmlElement::create(
                 'p',
                 ['class' => 'line-chart-error preformatted'],
-                $this->translate(sprintf('Invalid data received: %s'), join(' ', $perfdata->errors))
+                sprintf($msg, join(' ', $perfdata->errors)),
             ));
             return $main;
         }

@@ -47,6 +47,7 @@ trait PerfdataSource
         // base64 since there can be whatever in the names
         $cacheKey = base64_encode($host . $service . $checkcommand . $duration . $h);
 
+        // Check the cache for existing data
         if ($cacheKey !== null && $cacheDurationInSeconds > 0) {
             if ($cache->has($cacheKey, time() - $cacheDurationInSeconds)) {
                 Logger::debug('Found data in cache for ' . $cacheKey);
