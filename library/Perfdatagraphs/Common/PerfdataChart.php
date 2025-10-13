@@ -78,6 +78,9 @@ trait PerfdataChart
         // Where we store all elements for the charts.
         $charts = HtmlElement::create('div', [
             'class' => 'perfdata-charts-container collapsible',
+            // Note: We could have a configuration option to change the
+            // "always collapsed" behaviour
+            'data-visible-height' => 0,
             'data-toggle-element' => '.perfdata-charts-container-control',
         ]);
 
