@@ -84,7 +84,7 @@
             for (let elem of lineCharts) {
                 const perfdata =  JSON.parse(elem.getAttribute('data-perfdata'));
 
-                _this.data.set(elem.getAttribute('id'), perfdata.data);
+                _this.data.set(elem.getAttribute('id'), perfdata);
                 _this.renderCharts();
             }
         }
@@ -242,19 +242,13 @@
 
             this.icinga.logger.debug('perfdatagraphs', 'start renderCharts', this.data);
 
-            this.data.forEach((data, elemID, map) => {
+            this.data.forEach((dataset, elemID, map) => {
                 // Get the element in which we render the chart
                 const elem = document.getElementById(elemID);
 
                 if (elem === null) {
                     return;
                 }
-
-                // Small hack. Since we always collapse
-                // we got to remove the button when there's just one chart
-                if (data.length === 1) {
-                    document.getElementById(elemID + '-control').style.display = 'none';
-                };
 
                 // The size can vary from chart to chart for example when
                 // there are two contains on the page.
@@ -268,98 +262,97 @@
                 elem.replaceChildren();
 
                 // Create a new uplot chart for each performance dataset
-                data.forEach((dataset) => {
-                    dataset.timestamps = this.ensureArray(dataset.timestamps);
-                    // Base format function for the y-axis
-                    let formatYFunction = (u, vals, space) => vals.map(v => this.formatNumber(v));
-                    // Override the default uplot callback so that smaller values are
-                    // shown in the hover and not rounded.
-                    let formatLegendFunction = (u, rawValue) => rawValue == null ? '' : rawValue;
+                dataset.timestamps = this.ensureArray(dataset.timestamps);
+                // Base format function for the y-axis
+                let formatYFunction = (u, vals, space) => vals.map(v => this.formatNumber(v));
+                // Override the default uplot callback so that smaller values are
+                // shown in the hover and not rounded.
+                let formatLegendFunction = (u, rawValue) => rawValue == null ? '' : rawValue;
 
-                    // We change the format function based on the unit of the dataset
-                    // This can be extend in the future:
-                    // - Create a new format function that returns a formated string for the given value
-                    // - Add a new case with the function here
-                    // - Update the documentation to include the new format option
-                    switch (dataset.unit) {
-                    case 'bytes':
-                        formatYFunction = (u, vals, space) => vals.map(v => this.formatBytesSI(v));
-                        formatLegendFunction = (u, rawValue) => rawValue == null ? '' : this.formatBytesSI(rawValue) + ' (' + rawValue + ')';
-                        break;
-                    case 'seconds':
-                        formatYFunction = (u, vals, space) => vals.map(v => this.formatTimeSeconds(v));
-                        formatLegendFunction = (u, rawValue) => rawValue == null ? '' : this.formatTimeSeconds(rawValue) + ' (' + rawValue + ')';
-                        break;
-                    case 'percentage':
-                        formatYFunction = (u, vals, space) => vals.map(v => this.formatPercentage(v));
-                        formatLegendFunction = (u, rawValue) => rawValue == null ? '' : this.formatPercentage(rawValue) + ' (' + rawValue + ')';
-                        break;
+                // We change the format function based on the unit of the dataset
+                // This can be extend in the future:
+                // - Create a new format function that returns a formated string for the given value
+                // - Add a new case with the function here
+                // - Update the documentation to include the new format option
+                switch (dataset.unit) {
+                case 'bytes':
+                    formatYFunction = (u, vals, space) => vals.map(v => this.formatBytesSI(v));
+                    formatLegendFunction = (u, rawValue) => rawValue == null ? '' : this.formatBytesSI(rawValue) + ' (' + rawValue + ')';
+                    break;
+                case 'seconds':
+                    formatYFunction = (u, vals, space) => vals.map(v => this.formatTimeSeconds(v));
+                    formatLegendFunction = (u, rawValue) => rawValue == null ? '' : this.formatTimeSeconds(rawValue) + ' (' + rawValue + ')';
+                    break;
+                case 'percentage':
+                    formatYFunction = (u, vals, space) => vals.map(v => this.formatPercentage(v));
+                    formatLegendFunction = (u, rawValue) => rawValue == null ? '' : this.formatPercentage(rawValue) + ' (' + rawValue + ')';
+                    break;
+                }
+
+                opts.axes = [this.getXProperty(axesColor), this.getYProperty(axesColor, formatYFunction)];
+
+                // Add a new empty plot with a title for the dataset
+                opts.title = dataset.title;
+                opts.title += dataset.unit ? ' | ' + dataset.unit : '';
+
+                let u = new uPlot(opts, [], elem);
+                // Where we store the finished data for the chart
+                let d = [dataset.timestamps];
+
+                // Create the data for the plot and add the series
+                // Using a 'classic' for loop since we need the index
+                for (let idx = 0; idx < dataset.series.length; idx++) {
+                    // // The series we are going to add (e.g. values, warn, crit, etc.)
+                    let set = dataset.series[idx].values;
+                    set = this.ensureArray(set);
+
+                    // See if there are series options from the last autorefresh
+                    // if so we use them, otherwise the default.
+                    let show = this.currentSeriesShow[idx+1] ?? true;
+                    // Get the style either from the dataset or from CSS
+                    let stroke = dataset.stroke ?? valueColor;
+                    let fill = dataset.fill ?? this.ensureRgba(valueColor, 0.3);
+
+                    // Add a new series to the plot. Need adjust the index, since 0 is the timestamps
+                    if (dataset.series[idx].name === CHART_WARN_SERIESNAME) {
+                        stroke = warningColor;
+                        fill = false;
+                    }
+                    if (dataset.series[idx].name === CHART_CRIT_SERIESNAME) {
+                        stroke = criticalColor;
+                        fill = false;
                     }
 
-                    opts.axes = [this.getXProperty(axesColor), this.getYProperty(axesColor, formatYFunction)];
+                    u.addSeries({
+                        label: dataset.series[idx].name,
+                        stroke: stroke,
+                        fill: fill,
+                        show: show,
+                        value: formatLegendFunction,
+                    }, idx+1);
+                    // Add this to the final data for the chart
+                    d.push(set);
+                }
+                // Add the data to the chart
+                u.setData(d);
 
-                    // Add a new empty plot with a title for the dataset
-                    opts.title = dataset.title;
-                    opts.title += dataset.unit ? ' | ' + dataset.unit : '';
+                // If a selection is stored we restore it.
+                if (this.currentSelect !== null) {
+                    u.setScale('x', this.currentSelect);
+                }
+                // If a cursor is stored we restore it.
+                if (this.currentCursor !== null) {
+                    u.setCursor(this.currentCursor);
+                }
 
-                    let u = new uPlot(opts, [], elem);
-                    // Where we store the finished data for the chart
-                    let d = [dataset.timestamps];
+                // Add the chart to the map which we use for the resize observer
+                const _plots = this.plots.get(elem) || [];
 
-                    // Create the data for the plot and add the series
-                    // Using a 'classic' for loop since we need the index
-                    for (let idx = 0; idx < dataset.series.length; idx++) {
-                        // // The series we are going to add (e.g. values, warn, crit, etc.)
-                        let set = dataset.series[idx].values;
-                        set = this.ensureArray(set);
+                _plots.push(u)
 
-                        // See if there are series options from the last autorefresh
-                        // if so we use them, otherwise the default.
-                        let show = this.currentSeriesShow[idx+1] ?? true;
-                        // Get the style either from the dataset or from CSS
-                        let stroke = dataset.stroke ?? valueColor;
-                        let fill = dataset.fill ?? this.ensureRgba(valueColor, 0.3);
-
-                        // Add a new series to the plot. Need adjust the index, since 0 is the timestamps
-                        if (dataset.series[idx].name === CHART_WARN_SERIESNAME) {
-                            stroke = warningColor;
-                            fill = false;
-                        }
-                        if (dataset.series[idx].name === CHART_CRIT_SERIESNAME) {
-                            stroke = criticalColor;
-                            fill = false;
-                        }
-
-                        u.addSeries({
-                            label: dataset.series[idx].name,
-                            stroke: stroke,
-                            fill: fill,
-                            show: show,
-                            value: formatLegendFunction,
-                        }, idx+1);
-                        // Add this to the final data for the chart
-                        d.push(set);
-                    }
-                    // Add the data to the chart
-                    u.setData(d);
-
-                    // If a selection is stored we restore it.
-                    if (this.currentSelect !== null) {
-                        u.setScale('x', this.currentSelect);
-                    }
-                    // If a cursor is stored we restore it.
-                    if (this.currentCursor !== null) {
-                        u.setCursor(this.currentCursor);
-                    }
-
-                    // Add the chart to the map which we use for the resize observer
-                    const _plots = this.plots.get(elem) || [];
-
-                    _plots.push(u)
-
-                    this.plots.set(elem, _plots);
-                });
+                this.plots.set(elem, _plots);
             });
+
             this.icinga.logger.debug('perfdatagraphs', 'finish renderCharts', this.plots);
         }
 

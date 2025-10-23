@@ -78,6 +78,7 @@ trait PerfdataChart
         // Where we store all elements for the charts.
         $charts = HtmlElement::create('div', [
             'class' => 'perfdata-charts-container collapsible',
+            'id' => $elemID,
             // Note: We could have a configuration option to change the
             // "always collapsed" behaviour
             'data-visible-height' => 0,
@@ -91,14 +92,12 @@ trait PerfdataChart
             'id' => $elemID . '-control',
         ]);
 
-        $b = new HtmlElement(
+        $toggleButton = new HtmlElement(
             'button',
             null,
             new Icon('angle-double-up', ['class' => 'collapse-icon']),
             new Icon('angle-double-down', ['class' => 'expand-icon'])
         );
-
-        $chartsControl->add($b);
 
         // Add a headline and all other elements to our element.
         $header = Html::tag('h2', $this->translate('Performance Data Graph'));
@@ -150,18 +149,28 @@ trait PerfdataChart
             return $main;
         }
 
-        // Element in which the charts will get rendered.
+        $charts->add((new QuickActions(Url::fromRequest(), $config['default_timerange'])));
+
+        // Elements in which the charts will get rendered.
         // We use attributes on this elements to transport data
         // to the JavaScript part of this module.
-        $chart = HtmlElement::create('div', [
-            'id' => $elemID,
-            'class' => 'line-chart',
-            'data-perfdata' => Json::sanitize($perfdata),
-        ]);
+        foreach ($perfdata->getDatasets() as $dataset) {
+            $chart = HtmlElement::create('div', [
+                'class' => 'line-chart',
+                'id' => $elemID . '_' . $dataset->getTitle(),
+                'data-perfdata' => Json::sanitize($dataset),
+            ]);
 
-        $charts->add((new QuickActions(Url::fromRequest(), $config['default_timerange'])));
-        $charts->add($chart);
+            $charts->add($chart);
+        }
+
         $main->add($charts);
+
+        // We only need the toggle button when there are more charts
+        if (count($perfdata->getDatasets()) > 1) {
+            $chartsControl->add($toggleButton);
+        }
+
         $main->add($chartsControl);
 
         return $main;

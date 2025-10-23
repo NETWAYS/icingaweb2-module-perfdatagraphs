@@ -10,9 +10,20 @@ use JsonSerializable;
  */
 class PerfdataResponse implements JsonSerializable
 {
+    // List of PerfdataSets with their title as key
+    // ['rta'] = <PerfdataSet>
     protected array $data = [];
 
+    // List of error if there are any
     protected array $errors = [];
+
+    /**
+     * getErrors returns the errors.
+     */
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
 
     /**
      * addError adds an error message to this object.
@@ -54,6 +65,16 @@ class PerfdataResponse implements JsonSerializable
         }
 
         return true;
+    }
+
+    /**
+     * getDatasets returns the datasets.
+     *
+     * @return array
+     */
+    public function getDatasets(): array
+    {
+        return $this->data;
     }
 
     /**
