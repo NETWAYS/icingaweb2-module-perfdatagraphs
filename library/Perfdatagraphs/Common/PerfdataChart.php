@@ -166,7 +166,7 @@ trait PerfdataChart
             $source->storeDataToCache($cacheKey, $datasets);
         }
 
-        $charts->add((new QuickActions(Url::fromRequest(), $config['default_timerange'])));
+        $charts->add((new QuickActions(Url::fromRequest(), $config)));
 
         // Elements in which the charts will get rendered.
         // We use attributes on this elements to transport data

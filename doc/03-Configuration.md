@@ -18,12 +18,39 @@ Hint: If you only installed one backend module, it will be used by default. No n
 1. Install the Icinga Web Performance Data Graphs backend module you need (depending on where Icinga 2 sends its data)
 2. If there is more than one, configure the backend using the `Configuration → Modules → Performance Data Graphs → General` menu
 
-## Time Range
+## Timeranges
 
+The module defines a list of default timeranges.
 The value for the "Current" time range button can be configured.
 These buttons use ISO8601 durations in the background (e.g. PT3H, P1D, P1Y).
 
 By default it uses `PT12H` meaning, 12 hours.
+
+Custom timeranges can be defined by creating a `/etc/icingaweb2/modules/perfdatagraphs/timeranges.ini` configuration file:
+
+```ini
+;; The key needs to be an ISO8601 duration
+[PT24H]
+;; display_name is the name of the button
+display_name = "Day"
+;; href_title is the hover title of the button
+href_title = "Show performance data for the last day"
+;; href_icon is the icon of the button
+href_icon = "calendar"
+
+[P31D]
+display_name = "Month"
+href_title = "Show performance data for the last month"
+href_icon = "calendar"
+
+[P2Y]
+display_name = "2 Years"
+href_title = "Show performance data for the last 2 years"
+href_icon = "calendar"
+```
+
+**Note:** A higher timerange (e.g. many years) will load a lot of data from the backend.
+This might cause out-of-memory errors.
 
 ## Custom Variables
 

@@ -2,10 +2,12 @@
 
 namespace Icinga\Module\Perfdatagraphs\Widget;
 
+use Icinga\Application\Config;
+
 use ipl\Html\BaseHtmlElement;
 use ipl\Html\Html;
-use ipl\I18n\Translation;
 use ipl\Web\Url;
+use ipl\I18n\Translation;
 use ipl\Web\Widget\Icon;
 
 /**
@@ -15,11 +17,11 @@ class QuickActions extends BaseHtmlElement
 {
     use Translation;
 
+    protected $timeranges = [];
+
     protected $tag = 'ul';
 
     protected $defaultAttributes = ['class' => 'quick-actions'];
-
-    protected $defaultCurrentRange;
 
     // The URL parameter we append to the URL to specify the duration the backend should fetch
     protected $rangeURLParam = 'perfdatagraphs.duration';
@@ -27,14 +29,70 @@ class QuickActions extends BaseHtmlElement
     protected $baseURL;
 
     /**
-     * @param string $defaultCurrentRange Value for the "Current" time range button
-     * @param string $baseURL URL to use as base for the links. We get this from the request
+     * @param Url $baseURL URL to use as base for the links. We get this from the request
      * so that we can support IcingaDB and the monitoring module
+     * @param array $config the module's configuration
      */
-    public function __construct($baseURL, string $defaultCurrentRange = 'PT12H')
+    public function __construct(Url $baseURL, array $config)
     {
-        $this->defaultCurrentRange = $defaultCurrentRange;
         $this->baseURL = $baseURL;
+
+        $this->timeranges = $this->getDefaultTimeranges($config['default_timerange'] ?? 'PT12H');
+
+        $configuredRanges = $this->getConfigTimeranges();
+
+        if (count($configuredRanges) > 1) {
+            $this->timeranges = $configuredRanges;
+        }
+    }
+
+    /**
+     * getConfigTimeranges returns the timeranges from the configuration
+     */
+    protected function getConfigTimeranges(): array
+    {
+        // TODO: is a but redundant to get the config in the constructor and load it here. Could be improved
+        $tr = Config::module('perfdatagraphs', 'timeranges');
+        $timeranges = [];
+
+        foreach ($tr->keys() as $range) {
+            $timeranges[$range] = [
+                    'display_name' => $tr->get($range, 'display_name', 'INVALID'),
+                    'href_title' => $tr->get($range, 'href_title', ''),
+                    'href_icon' => $tr->get($range, 'href_icon', 'calendar'),
+            ];
+        }
+
+        return $timeranges;
+    }
+
+    /**
+     * getDefaultTimeranges returns a default set of timeranges
+     */
+    protected function getDefaultTimeranges(string $defaultCurrentRange): array
+    {
+        return [
+            $defaultCurrentRange => [
+                "display_name" => $this->translate("Current"),
+                "href_title" => $this->translate("Show performance data for the 12 hours"),
+                "href_icon" => "calendar",
+            ],
+            'P1D' => [
+                "display_name" => $this->translate("Day"),
+                "href_title" => $this->translate("Show performance data for the last day"),
+                "href_icon" => "calendar",
+            ],
+            'P7D' => [
+                "display_name" => $this->translate("Week"),
+                "href_title" => $this->translate("Show performance data for the last week"),
+                "href_icon" => "calendar",
+            ],
+            'P30D' => [
+                "display_name" => $this->translate("Month"),
+                "href_title" => $this->translate("Show performance data for the last month"),
+                "href_icon" => "calendar",
+            ]
+        ];
     }
 
     /**
@@ -42,50 +100,18 @@ class QuickActions extends BaseHtmlElement
      */
     protected function assemble(): void
     {
-        $current = Html::tag(
-            'a',
-            [
-                'href' => $this->baseURL->overwriteParams([$this->rangeURLParam => $this->defaultCurrentRange])->getAbsoluteUrl(),
-                'class' => 'action-link',
-                'title' => $this->translate('Show the current performance data'),
-            ],
-            [ new Icon('calendar'), $this->translate('Current') ]
-        );
+        foreach ($this->timeranges as $timerange => $details) {
+            $elem = Html::tag(
+                'a',
+                [
+                    'href' => $this->baseURL->overwriteParams([$this->rangeURLParam => $timerange])->getAbsoluteUrl(),
+                    'class' => 'action-link',
+                    'title' => $this->translate($details['href_title']),
+                ],
+                [ new Icon($details['href_icon'] ?? 'calender'), $this->translate($details['display_name']) ]
+            );
 
-        $this->add(Html::tag('li', $current));
-
-        $day = Html::tag(
-            'a',
-            [
-                'href' => $this->baseURL->overwriteParams([$this->rangeURLParam => 'P1D'])->getAbsoluteUrl(),
-                'class' => 'action-link',
-                'title' => $this->translate('Show performance data for the last day'),
-            ],
-            [ new Icon('calendar'), $this->translate('Day') ]
-        );
-
-        $week = Html::tag(
-            'a',
-            [
-                'href' => $this->baseURL->overwriteParams([$this->rangeURLParam => 'P7D'])->getAbsoluteUrl(),
-                'class' => 'action-link',
-                'title' => $this->translate('Show performance data for the last week'),
-            ],
-            [ new Icon('calendar'), $this->translate('Week') ]
-        );
-
-        $month = Html::tag(
-            'a',
-            [
-                'href' => $this->baseURL->overwriteParams([$this->rangeURLParam => 'P31D'])->getAbsoluteUrl(),
-                'class' => 'action-link',
-                'title' => $this->translate('Show performance data for the last month'),
-            ],
-            [ new Icon('calendar'), $this->translate('Month') ]
-        );
-
-        $this->add(Html::tag('li', $day));
-        $this->add(Html::tag('li', $week));
-        $this->add(Html::tag('li', $month));
+            $this->add(Html::tag('li', $elem));
+        }
     }
 }
