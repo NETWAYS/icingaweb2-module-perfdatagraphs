@@ -57,7 +57,7 @@ class QuickActions extends BaseHtmlElement
 
         foreach ($tr->keys() as $range) {
             $timeranges[$range] = [
-                    'display_name' => $tr->get($range, 'display_name', 'INVALID'),
+                    'display_name' => $tr->get($range, 'display_name', $range),
                     'href_title' => $tr->get($range, 'href_title', ''),
                     'href_icon' => $tr->get($range, 'href_icon', 'calendar'),
             ];
