@@ -103,7 +103,7 @@ trait PerfdataChart
         $main->add($header);
 
         // Load the module's configuration.
-        $config = ModuleConfig::getConfig();
+        $config = ModuleConfig::getConfigWithDefaults();
 
         $duration = $config['default_timerange'];
 
@@ -166,7 +166,7 @@ trait PerfdataChart
             $source->storeDataToCache($cacheKey, $datasets);
         }
 
-        $charts->add((new QuickActions(Url::fromRequest(), $config)));
+        $charts->add((new QuickActions(Url::fromRequest())));
 
         // Elements in which the charts will get rendered.
         // We use attributes on this elements to transport data

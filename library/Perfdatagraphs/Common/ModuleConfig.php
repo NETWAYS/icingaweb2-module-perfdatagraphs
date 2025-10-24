@@ -67,11 +67,21 @@ class ModuleConfig
     }
 
     /**
-     * getConfig loads all configuration options with their defaults.
+     * getConfig returns the module's configuration
      *
      * @return array
      */
-    public static function getConfig(Config $moduleConfig = null): array
+    public static function getConfig(): Config
+    {
+        return Config::module('perfdatagraphs');
+    }
+
+    /**
+     * getConfigWithDefaults loads all configuration options with their defaults.
+     *
+     * @return array
+     */
+    public static function getConfigWithDefaults(Config $moduleConfig = null): array
     {
         $default = [
             'cache_lifetime' => 900,

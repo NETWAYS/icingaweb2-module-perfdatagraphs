@@ -26,7 +26,10 @@ These buttons use ISO8601 durations in the background (e.g. PT3H, P1D, P1Y).
 
 By default it uses `PT12H` meaning, 12 hours.
 
-Custom timeranges can be defined by creating a `/etc/icingaweb2/modules/perfdatagraphs/timeranges.ini` configuration file:
+Custom timeranges can be defined by creating a `/etc/icingaweb2/modules/perfdatagraphs/timeranges.ini` configuration file.
+
+**Note:** A higher timerange (e.g. many years) will load a lot of data from the backend.
+This might cause out-of-memory errors. It is recommended to use the default timeranges.
 
 ```ini
 ;; The key needs to be an ISO8601 duration
@@ -48,9 +51,6 @@ display_name = "2 Years"
 href_title = "Show performance data for the last 2 years"
 href_icon = "calendar"
 ```
-
-**Note:** A higher timerange (e.g. many years) will load a lot of data from the backend.
-This might cause out-of-memory errors.
 
 ## Custom Variables
 

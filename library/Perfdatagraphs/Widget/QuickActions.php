@@ -30,14 +30,13 @@ class QuickActions extends BaseHtmlElement
 
     /**
      * @param Url $baseURL URL to use as base for the links. We get this from the request
-     * so that we can support IcingaDB and the monitoring module
-     * @param array $config the module's configuration
+     * so that we can support IcingaDB and the monitoring module.
      */
-    public function __construct(Url $baseURL, array $config)
+    public function __construct(Url $baseURL)
     {
         $this->baseURL = $baseURL;
 
-        $this->timeranges = $this->getDefaultTimeranges($config['default_timerange'] ?? 'PT12H');
+        $this->timeranges = $this->getDefaultTimeranges();
 
         $configuredRanges = $this->getConfigTimeranges();
 
@@ -51,7 +50,6 @@ class QuickActions extends BaseHtmlElement
      */
     protected function getConfigTimeranges(): array
     {
-        // TODO: is a but redundant to get the config in the constructor and load it here. Could be improved
         $tr = Config::module('perfdatagraphs', 'timeranges');
         $timeranges = [];
 
@@ -69,8 +67,15 @@ class QuickActions extends BaseHtmlElement
     /**
      * getDefaultTimeranges returns a default set of timeranges
      */
-    protected function getDefaultTimeranges(string $defaultCurrentRange): array
+    protected function getDefaultTimeranges(): array
     {
+        $defaultCurrentRange = 'PT12H';
+        $config = Config::module('perfdatagraphs');
+
+        if ($config !== null) {
+                $defaultCurrentRange = $config->get('perfdatagraphs', 'default_timerange', 'PT12H');
+        }
+
         return [
             $defaultCurrentRange => [
                 "display_name" => $this->translate("Current"),
