@@ -82,7 +82,7 @@
             _this.icinga.logger.debug('perfdatagraphs', 'start fetchData', lineCharts);
 
             for (let elem of lineCharts) {
-                const perfdata =  JSON.parse(elem.getAttribute('data-perfdata'));
+                const perfdata = JSON.parse(elem.getAttribute('data-perfdata'));
 
                 _this.data.set(elem.getAttribute('id'), perfdata);
                 _this.renderCharts();
@@ -335,6 +335,7 @@
                         stroke: stroke,
                         fill: fill,
                         show: show,
+                        gaps: this.timeseriesThresholdGapFunction,
                         value: formatLegendFunction,
                     }, idx+1);
                     // Add this to the final data for the chart
@@ -500,6 +501,49 @@
             const value = (n / Math.pow(k, i)).toFixed(2);
 
             return `${value} ${units[i]}`;
+        }
+
+        /**
+         * timeseriesThresholdGapFunction is a gap function for uPlot
+         * to add gaps for then there is no data.
+         */
+        timeseriesThresholdGapFunction(u, sidx, idx0, idx1, nullGaps)
+        {
+            let xData = u.data[0];
+            let yData = u.data[sidx];
+
+            // If the timestamps differ by delta (e.g. the check_interval)
+            // we add a gap. But users can change the check_interval.
+            // Thus, we calculate delta for the entire set and then
+            // if there is a change in deltas.
+            let previousDelta = 60;
+            // Since check_interval is not perfect, we expect some jitter
+            const jitter = 5;
+            // Just for convenience
+            const isNum = Number.isFinite;
+
+            let addlGaps = [];
+
+            for (let i = idx0 + 1; i <= idx1; i++) {
+                if (isNum(yData[i]) && isNum(yData[i-1])) {
+                    const currentDelta = xData[i] - xData[i - 1];
+
+                    if (currentDelta > previousDelta + jitter) {
+                        uPlot.addGap(
+                            addlGaps,
+                            Math.round(u.valToPos(xData[i - 1], 'x', true)),
+                            Math.round(u.valToPos(xData[i],     'x', true)),
+                        );
+                    }
+
+                    previousDelta = currentDelta;
+                }
+            }
+
+            nullGaps.push(...addlGaps);
+            nullGaps.sort((a, b) => a[0] - b[0]);
+
+            return nullGaps;
         }
     }
 
