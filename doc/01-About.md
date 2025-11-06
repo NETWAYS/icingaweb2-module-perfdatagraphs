@@ -33,7 +33,7 @@ An option to manually merge metrics into one chart could be added in the future.
 
 ### Gaps when there is no data
 
-When there is missing data in the chart will show a gap and not connect the datapoints to avoid misinterpretation.
+If there is missing data, the chart will show gaps and will not connect the data points to avoid misinterpretation.
 Changes in a check interval are automatically accounted for.
 
 ### Custom variables
