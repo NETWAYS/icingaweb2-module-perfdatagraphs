@@ -4,11 +4,12 @@
 
 - Rework data-fetching to use PHP
 - Add human-readable units in legend
-- Extend IcingaObjectHelper to be able to resolve Macros
-- Use locale to adjust time format in legend
-- Fix inconsistent collapsible behavior during autorefresh
 - Add the option to configure custom timeranges
+- Gaps for missing data are automatically added
+- Use locale to adjust time format in legend
 - Fix memory leak in chart rendering
+- Fix inconsistent collapsible behavior during autorefresh
+- Extend IcingaObjectHelper to be able to resolve Macros
 
 ## v0.1.2
 

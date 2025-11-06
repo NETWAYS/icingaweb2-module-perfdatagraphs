@@ -42,6 +42,5 @@ What our current idea for a version 1.0.0 of this module is:
 
 * It should work with every Icinga performance data writer with minimal configuration by the user
 * It should be a robust solution for all check plugins
-* It should integrate seamlessly in the Icinga Web UI, without degrading performance
-  (e.g. when a plugin lots of data)
+* It should integrate seamlessly in the Icinga Web UI
 * It should provide enough options for customization for most use cases

@@ -57,6 +57,7 @@
                 // 1: value, 2: warning, 3: critical
                 _this.currentSeriesShow = {};
                 _this.currentCursor = null;
+                _this.data = new Map();
             }
 
             // Now we fetch

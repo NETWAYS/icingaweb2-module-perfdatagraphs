@@ -5,7 +5,7 @@ and a "backend" module, which is responsible for fetching the data from a perfor
 
 ## Packages
 
-To install the module via package manager, follow the setup instructions for the **extras** repo from [packages.netways.de](https://packages.netways.de/).
+To install the module via package manager, follow the setup instructions for the **extras** repository from [packages.netways.de](https://packages.netways.de/).
 
 Afterwards you can install the package on these supported systems.
 
@@ -17,7 +17,7 @@ Afterwards you can install the package on these supported systems.
 
 `apt install icingaweb2-module-perfdatagraphs`
 
-In addition to the main package, please install the preferred perfdata backend package from the repo as well.
+In addition to the main package, please install the preferred performance data backend package from the repository as well.
 
 
 ## From source
