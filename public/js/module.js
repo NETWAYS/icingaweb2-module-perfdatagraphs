@@ -517,9 +517,9 @@
             // we add a gap. But users can change the check_interval.
             // Thus, we calculate delta for the entire set and then
             // if there is a change in deltas.
-            let previousDelta = 60;
+            let previousDelta = 60; // We start at 60 since 1m is Icinga2's default
             // Since check_interval is not perfect, we expect some jitter
-            const jitter = 5;
+            const jitter = 5; // I chose 5 arbitrarily
             // Just for convenience
             const isNum = Number.isFinite;
 
