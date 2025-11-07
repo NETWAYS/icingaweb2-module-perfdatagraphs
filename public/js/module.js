@@ -86,7 +86,6 @@
                 const perfdata = JSON.parse(elem.getAttribute('data-perfdata'));
 
                 _this.data.set(elem.getAttribute('id'), perfdata);
-                _this.renderCharts();
             }
         }
 
