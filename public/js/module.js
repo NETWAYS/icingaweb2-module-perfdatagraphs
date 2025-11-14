@@ -7,8 +7,6 @@
     // Names to identify the warning/critical series
     const CHART_WARN_SERIESNAME = 'warning';
     const CHART_CRIT_SERIESNAME = 'critical';
-    // Options for formatting datetime
-    const CHART_LEGEND_FORMAT = new Intl.DateTimeFormat(undefined, {dateStyle: 'short', timeStyle: 'medium'}).format;
 
     class Perfdatagraphs extends Icinga.EventListener {
         // plots contains the chart objects with the element ID where it is rendered as key.
@@ -144,8 +142,9 @@
          */
         getChartBaseOptions()
         {
-            // Not sure if this can be undefined or not
-            let timezone = this.icinga.config.timezone ? this.icinga.config.timezone : Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // Options for formatting datetime
+            const timezone = this.icinga.config.timezone;
+            const legendFormat = new Intl.DateTimeFormat(undefined, {dateStyle: 'short', timeStyle: 'medium', timeZone: timezone}).format;
 
             // The shared options for each chart. These
             // can then be combined with individual options e.g. the width.
@@ -170,7 +169,7 @@
                 // labels & value display in the legend
                 series: [
                     {
-                        value: (u, ts) => ts == null ? '' : CHART_LEGEND_FORMAT(uPlot.tzDate(new Date(ts * 1e3), timezone))
+                        value: (u, ts) => ts == null ? '' : legendFormat(uPlot.tzDate(new Date(ts * 1e3), timezone))
                     }
                 ],
                 hooks: {
