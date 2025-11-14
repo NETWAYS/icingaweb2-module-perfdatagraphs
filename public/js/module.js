@@ -144,10 +144,14 @@
          */
         getChartBaseOptions()
         {
+            // Not sure if this can be undefined or not
+            let timezone = this.icinga.config.timezone ? this.icinga.config.timezone : Intl.DateTimeFormat().resolvedOptions().timeZone;
+
             // The shared options for each chart. These
             // can then be combined with individual options e.g. the width.
             const opts = {
                 cursor: { sync: { key: 0, setSeries: true } },
+                tzDate: ts => uPlot.tzDate(new Date(ts * 1e3), timezone),
                 scales: {
                     x: { time: true },
                     y: { range: {
@@ -166,7 +170,7 @@
                 // labels & value display in the legend
                 series: [
                     {
-                        value: (u, ts) => ts == null ? '' : CHART_LEGEND_FORMAT(uPlot.tzDate(new Date(ts * 1e3), 'Etc/UTC'))
+                        value: (u, ts) => ts == null ? '' : CHART_LEGEND_FORMAT(uPlot.tzDate(new Date(ts * 1e3), timezone))
                     }
                 ],
                 hooks: {
