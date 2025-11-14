@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1
+
+- Fix timezone not being used
+
 ## v0.2.0
 
 - Rework data-fetching to use PHP

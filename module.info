@@ -1,5 +1,5 @@
 Name: Performance Data Graphs
-Version: 0.2.0
+Version: 0.2.1
 Requires:
   Libraries: icinga-php-library (>=0.13.0)
   Modules: icingadb (>=1.0.0), monitoring (>= 2.12.0)
