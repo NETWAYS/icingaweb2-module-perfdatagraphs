@@ -1,6 +1,6 @@
 # Configuration
 
-This describes the configuration options for the "frontend" module.
+This describes the configuration options for this module.
 
 ```
 cat /etc/icingaweb2/modules/perfdatagraphs/config.ini

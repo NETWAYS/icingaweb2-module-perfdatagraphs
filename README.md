@@ -1,5 +1,3 @@
-**Note:** This is an early release that is still in development and prone to change
-
 # Icinga Web Performance Data Graphs
 
 Icinga Web Module for Performance Data Graphs. This module enables graphs on the Host and Service Detail View for
@@ -11,9 +9,10 @@ the respective performance data.
 
 The data is fetched by a "backend module", at least one backend module also need to be enabled:
 
-* [Graphite Backend](https://github.com/NETWAYS/icingaweb2-module-perfdatagraphs-graphite/)
-* [Influxdb v1 Backend](https://github.com/NETWAYS/icingaweb2-module-perfdatagraphs-influxdbv1)
-* [Influxdb v2 Backend](https://github.com/NETWAYS/icingaweb2-module-perfdatagraphs-influxdbv2)
+* [Graphite backend](https://github.com/NETWAYS/icingaweb2-module-perfdatagraphs-graphite/)
+* [Influxdb v1 backend](https://github.com/NETWAYS/icingaweb2-module-perfdatagraphs-influxdbv1)
+* [Influxdb v2 backend](https://github.com/NETWAYS/icingaweb2-module-perfdatagraphs-influxdbv2)
+* [Write your own backend](doc/20-PerfdataSourceHook.md)
 
 This module aims to be a "batteries included" and opinionated solution.
 Configuration options are limited by design.
@@ -38,7 +37,7 @@ Documentation for this module is available at [doc](doc/).
 
 ## Known Issues
 
-### Timeout or page performance degeration when rendering many charts
+### Timeout or page performance degradation when rendering many charts
 
 When there are many performance data timeseries for a singe check command,
 and the selected time range is very long, fetching the data might timeout.

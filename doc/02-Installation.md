@@ -5,9 +5,9 @@ and a "backend" module, which is responsible for fetching the data from a perfor
 
 ## Packages
 
-To install the module via package manager, follow the setup instructions for the **extras** repository from [packages.netways.de](https://packages.netways.de/).
+NETWAYS provides this module via [https://packages.netways.de](https://packages.netways.de/).
 
-Afterwards you can install the package on these supported systems.
+To install this module, follow the setup instructions for the **extras** repository.
 
 **RHEL or compatible:**
 
@@ -17,8 +17,7 @@ Afterwards you can install the package on these supported systems.
 
 `apt install icingaweb2-module-perfdatagraphs`
 
-In addition to the main package, please install the preferred performance data backend package from the repository as well.
-
+Additionally, a backend module (Graphite, InfluxDB, etc.) needs to be installed.
 
 ## From source
 
