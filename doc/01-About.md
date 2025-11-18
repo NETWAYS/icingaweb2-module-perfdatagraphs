@@ -11,7 +11,7 @@ flowchart TD
     B --> C{PerfdataSourceHook}
     C -->|Hook implemented by| D[perfdatagraphs-graphite]
     C -->|Hook implemented by| E[perfdatagraphs-influx]
-    C -->|Hook implemented by| F[perfdatagraphs-elasticsearch]
+    C -->|Hook implemented by| F[perfdatagraphs-elastic]
 ```
 
 ## Features
