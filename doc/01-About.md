@@ -5,6 +5,15 @@ the respective performance data.
 
 The actual data is fetched by a "backend module", this module and at least one backend module need to be enabled.
 
+```mermaid
+flowchart TD
+    A[Icinga Web] -->|Host-Service-Hook| B(perfdatagraphs)
+    B --> C{PerfdataSourceHook}
+    C -->|Hook implemented by| D[perfdatagraphs-graphite]
+    C -->|Hook implemented by| E[perfdatagraphs-influx]
+    C -->|Hook implemented by| F[perfdatagraphs-elasticsearch]
+```
+
 ## Features
 
 * Interactive graphs for Host and Service performance data

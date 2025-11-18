@@ -92,7 +92,6 @@ use Icinga\Module\Perfdatagraphs\Model\PerfdataResponse;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataSet;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataSeries;
 
-
 class PerfdataSource extends PerfdataSourceHook
 {
     public function getName(): string
@@ -106,7 +105,7 @@ class PerfdataSource extends PerfdataSourceHook
 
         $dataset = new PerfdataSet('latency', 'seconds');
 
-        dataset->setTimestamps([1763400100, 1763400200, 1763400300]);
+        $dataset->setTimestamps([1763400100, 1763400200, 1763400300]);
 
         $values = new PerfdataSeries('value', [1, 5, 3]);
         $dataset->addSeries($values);
