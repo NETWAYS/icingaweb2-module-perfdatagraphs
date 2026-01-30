@@ -32,7 +32,7 @@ class PerfdataGraphsConfigForm extends ConfigForm
 
         $enum = array();
         foreach ($hooks as $hook) {
-            $enum[strtolower($hook->getName())] = $hook->getName();
+            $enum[mb_strtolower($hook->getName())] = $hook->getName();
         }
         asort($enum);
 
