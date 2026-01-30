@@ -58,7 +58,7 @@ class ModuleConfig
         // See if we can find the configured hook in the available hooks
         // If not then we return the first we find, which could still be none
         foreach ($hooks as $hook) {
-            if ($configuredHookName === $hook->getName()) {
+            if (strtolower($configuredHookName) === strtolower($hook->getName())) {
                 return $hook;
             }
         }

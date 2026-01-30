@@ -32,7 +32,7 @@ class PerfdataGraphsConfigForm extends ConfigForm
 
         $enum = array();
         foreach ($hooks as $hook) {
-            $enum[get_class($hook)] = $hook->getName();
+            $enum[strtolower($hook->getName())] = $hook->getName();
         }
         asort($enum);
 
@@ -82,7 +82,7 @@ class PerfdataGraphsConfigForm extends ConfigForm
             [
                 'label' => $this->translate('Default Data Backend'),
                 'description' => $this->translate('Default backend for the performance data graphs. With only one backend is installed, it will be used by default.'),
-                'multiOptions' => array_merge($choose, array_combine($backends, $backends)),
+                'multiOptions' => array_merge($choose, $backends),
                 'class' => 'autosubmit',
             ]
         );
