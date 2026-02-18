@@ -3,6 +3,7 @@
 namespace Icinga\Module\Perfdatagraphs\Model;
 
 use JsonSerializable;
+use SplFixedArray;
 
 /**
  * PerfdataSeries represents a single series (y-axis) on the chart.
@@ -64,6 +65,10 @@ class PerfdataSeries implements JsonSerializable
      */
     public function addValue(mixed $value): void
     {
+        if ($this->values instanceof SplFixedArray) {
+            return;
+        }
+
         $this->values[] = $value;
     }
 

@@ -3,6 +3,7 @@
 namespace Icinga\Module\Perfdatagraphs\Model;
 
 use JsonSerializable;
+use SplFixedArray;
 
 /**
  * PerfdataSet represents a single chart in the frontend.
@@ -310,6 +311,10 @@ class PerfdataSet implements JsonSerializable
      */
     public function addTimestamp(mixed $timestamp): void
     {
+        if ($this->timestamps instanceof SplFixedArray) {
+            return;
+        }
+
         $this->timestamps[] = $timestamp;
     }
 }
