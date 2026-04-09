@@ -33,7 +33,6 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
 
         // Check if charts are disabled for this object, if so we just return.
         if ($customvars[$cvh::CUSTOM_VAR_CONFIG_DISABLE] ?? false) {
-//            return HtmlString::create('');
             return Html::tag('div');
         }
 
@@ -44,7 +43,6 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
 
         if (empty($chart)) {
             // Probably unecessary but just to be safe.
-            //return HtmlString::create('');
             return Html::tag('div');
         }
 
