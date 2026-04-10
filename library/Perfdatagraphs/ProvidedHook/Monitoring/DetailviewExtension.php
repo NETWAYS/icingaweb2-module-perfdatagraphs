@@ -91,8 +91,8 @@ class DetailviewExtension extends DetailviewExtensionHook
             $response->setDatasetToHighlight($customvars[$cvh::CUSTOM_VAR_CONFIG_HIGHLIGHT] ?? '');
         }
 
-        // Get the configured element for the host.
-        $chart = $this->createChart($request, $response);
+        $limit = (count($metricsToInclude) > 0 || count($metricsToExclude) > 0) ? -1 : 3;
+        $chart = $this->createChart($request, $response, $limit);
 
         if (empty($chart)) {
             $err = Html::tag('div');

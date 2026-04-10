@@ -102,7 +102,7 @@ class GraphController extends CompatController
         $response = $source->fetch($request, $customVarsMetrics);
 
         // Get the configured element for the host.
-        $chart = $this->createChart($request, $response);
+        $chart = $this->createChart($request, $response, -1);
 
         if (empty($chart)) {
             $err = Html::tag('div');

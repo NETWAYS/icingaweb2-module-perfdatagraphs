@@ -44,7 +44,7 @@ trait PerfdataChart
      * @param PerfdataResponse $response We need the response because where else would the data be?
      * @return ValidHtml
      */
-    public function createChart(PerfdataRequest $request, PerfdataResponse $response): ValidHtml
+    public function createChart(PerfdataRequest $request, PerfdataResponse $response, int $limit = 3): ValidHtml
     {
         // Generic container for all elements we want to create here.
         $main = HtmlElement::create('div', ['class' => 'perfdata-charts']);
@@ -117,19 +117,24 @@ trait PerfdataChart
             $datasets[$dataset->getTitle()] = Json::sanitize($dataset);
         }
 
+        // We only render the first three (magic number has no meaning) charts unless include/exclude is set
+        $count = 0;
+
         // Elements in which the charts will get rendered.
         // We use attributes on this elements to transport data
         // to the JavaScript part of this module
-        // TODO: Only add the first three unless include/exclude is specified - Or all if we're on the dedicated page
         foreach ($datasets as $title => $data) {
+            if ($limit != -1 && $count >= $limit) {
+                break;
+            }
             $chart = HtmlElement::create('div', [
                 // We use a perfdatagraphs prefix here to avoid overlap with other modules (i.e. Icinga Kubernetes)
                 'class' => 'perfdatagraphs-line-chart',
                 'id' => $elemID . '_' . $title,
                 'data-perfdata' => $data,
             ]);
-
             $charts->add($chart);
+            $count++;
         }
 
         $main->add($charts);
