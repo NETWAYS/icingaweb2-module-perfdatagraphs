@@ -62,8 +62,35 @@ i.spinner {
 Small fix so that the active border is not cut off
 */
 ul.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    list-style-type: none;
+    margin: 0 -.5em;
     padding: 3px;
     & > li > a:focus {
         outline: none;
+    }
+
+
+    a {
+        text-decoration: none;
+    }
+
+    a,
+    button {
+        padding: .25em;
+        .rounded-corners();
+        display: inline-flex;
+        align-items: baseline;
+
+        &:hover {
+            background: @gray-lighter;
+        }
+    }
+
+    li {
+        margin: 0 .25em .5em .25em;
+        vertical-align: middle;
+        white-space: nowrap;
     }
 }
