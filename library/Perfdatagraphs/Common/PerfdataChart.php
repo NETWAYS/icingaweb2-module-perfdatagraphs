@@ -3,6 +3,8 @@
 namespace Icinga\Module\Perfdatagraphs\Common;
 
 use Icinga\Module\Perfdatagraphs\Widget\QuickActions;
+use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Model\PerfdataResponse;
 
 use Icinga\Application\Benchmark;
 use Icinga\Application\Logger;
@@ -13,7 +15,6 @@ use ipl\Html\HtmlElement;
 use ipl\Html\ValidHtml;
 use ipl\I18n\Translation;
 use ipl\Web\Url;
-use ipl\Web\Widget\Icon;
 
 /**
  * PerfdataChart contains common functionality used for rendering the performance data charts.
@@ -39,14 +40,11 @@ trait PerfdataChart
     /**
      * createChart creates HTMLElements that are used to render charts in.
      *
-     * @param string $hostName Name of the host
-     * @param string $serviceName Name of the service
-     * @param string $checkcommandName Name of the checkcommand
-     * @param bool $isHostCheck Is this a Host check
-     *
+     * @param PerfdataRequest $request We need the request because it contains names of host/service
+     * @param PerfdataResponse $response We need the response because where else would the data be?
      * @return ValidHtml
      */
-    public function createChart(string $hostName, string $serviceName, string $checkCommandName, bool $isHostCheck): ValidHtml
+    public function createChart(PerfdataRequest $request, PerfdataResponse $response): ValidHtml
     {
         // Generic container for all elements we want to create here.
         $main = HtmlElement::create('div', ['class' => 'perfdata-charts']);
@@ -65,31 +63,13 @@ trait PerfdataChart
         }
 
         // How we identify our elements in JS.
-        $elemID = $this->generateID($hostName, $serviceName, $checkCommandName);
+        $elemID = $this->generateID($request->getHostname(), $request->getServicename(), $request->getCheckcommand());
 
         // Where we store all elements for the charts.
-        $charts = HtmlElement::create('div', [
-            'class' => 'perfdata-charts-container collapsible',
-            'id' => $elemID,
-            // Note: We could have a configuration option to change the
-            // "always collapsed" behaviour
-            'data-visible-height' => 0,
-            'data-toggle-element' => '.perfdata-charts-container-control',
-        ]);
+        $charts = HtmlElement::create('div', ['class' => 'perfdata-charts-container', 'id' => $elemID]);
 
-        // We create our own collapsible control because we might
-        // want to identify it in the JS
-        $chartsControl = HtmlElement::create('div', [
-            'class' => 'perfdata-charts-container-control',
-            'id' => $elemID . '-control',
-        ]);
-
-        $toggleButton = new HtmlElement(
-            'button',
-            null,
-            new Icon('angle-double-up', ['class' => 'collapse-icon']),
-            new Icon('angle-double-down', ['class' => 'expand-icon'])
-        );
+        // We create our own collapsible control because we might want to identify it in the JS
+        $chartsControl = HtmlElement::create('div', ['class' => 'perfdata-charts-container-control', 'id' => $elemID . '-control']);
 
         // Add a headline and all other elements to our element.
         $header = Html::tag('h2', $this->translate('Performance Data Graph'));
@@ -106,57 +86,41 @@ trait PerfdataChart
             $duration = Url::fromRequest()->getParam('perfdatagraphs.duration');
         }
 
-        $source = new PerfdataSource($config);
-
-        $cacheDurationInSeconds = $config['cache_lifetime'];
-        $h = $isHostCheck ? 'true': 'false';
-        // base64 since there can be whatever in the names
-        $cacheKey = base64_encode($hostName . $serviceName . $checkCommandName . $duration . $h);
-
         Benchmark::measure('Rendering performance data elements');
-
-        // Get data from cache if it is available
-        $datasets = $source->getDataFromCache($cacheKey, $cacheDurationInSeconds);
 
         $main->add((new QuickActions(Url::fromRequest())));
 
-        // If not, fetch the perfdata for a given object via the hook.
-        if (!$datasets) {
-            $perfdata = $source->fetchDataViaHook($hostName, $serviceName, $checkCommandName, $duration, $isHostCheck);
-            $msg = null;
+        $errorMsg = null;
 
-            // Error handling, if this gets too long, we could move this to a method.
-            if ($perfdata->hasErrors()) {
-                $msg = sprintf($this->translate('Error while fetching data: %s'), join(' ', $perfdata->getErrors()));
-                Logger::debug('Error while fetching data: %s', Json::sanitize($perfdata));
-            }
+        // Error handling, if this gets too long, we could move this to a method.
+        if ($response->hasErrors()) {
+            $errorMsg = sprintf($this->translate('Error while fetching data: %s'), join(' ', $response->getErrors()));
+            Logger::debug('Error while fetching data: %s', Json::sanitize($response));
+        }
 
-            if ($perfdata->isEmpty()) {
-                $msg = $msg . ' ' . $this->translate('No data received.');
-            }
+        if ($response->isEmpty()) {
+            $errorMsg = $errorMsg . ' ' . $this->translate('No data received.');
+        }
 
-            if (!$perfdata->isValid()) {
-                $msg = $msg . ' ' . sprintf($this->translate('Invalid data received: %s'), join(' ', $perfdata->getErrors()));
-                Logger::debug('Invalid data received: %s', Json::sanitize($perfdata));
-            }
+        if (!$response->isValid()) {
+            $errorMsg = $errorMsg . ' ' . sprintf($this->translate('Invalid data received: %s'), join(' ', $response->getErrors()));
+            Logger::debug('Invalid data received: %s', Json::sanitize($response));
+        }
 
-            if (isset($msg)) {
-                $main->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $msg));
-                return $main;
-            }
+        if (isset($errorMsg)) {
+            $main->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $errorMsg));
+            return $main;
+        }
 
-            foreach ($perfdata->getDatasets() as $dataset) {
-                $datasets[$dataset->getTitle()] = Json::sanitize($dataset);
-            }
-
-            // After transforming the data store it. We're just storing the acutal datasets
-            // since the rest is just relevant for the request.
-            $source->storeDataToCache($cacheKey, $datasets);
+        $datasets = [];
+        foreach ($response->getDatasets() as $dataset) {
+            $datasets[$dataset->getTitle()] = Json::sanitize($dataset);
         }
 
         // Elements in which the charts will get rendered.
         // We use attributes on this elements to transport data
-        // to the JavaScript part of this module.
+        // to the JavaScript part of this module
+        // TODO: Only add the first three unless include/exclude is specified - Or all if we're on the dedicated page
         foreach ($datasets as $title => $data) {
             $chart = HtmlElement::create('div', [
                 // We use a perfdatagraphs prefix here to avoid overlap with other modules (i.e. Icinga Kubernetes)
@@ -170,14 +134,9 @@ trait PerfdataChart
 
         $main->add($charts);
 
-        Benchmark::measure('Rendered performance data elements');
-
-        // We only need the toggle button when there are more charts
-        if (count($datasets) > 1) {
-            $chartsControl->add($toggleButton);
-        }
-
         $main->add($chartsControl);
+
+        Benchmark::measure('Rendered performance data elements');
 
         return $main;
     }
