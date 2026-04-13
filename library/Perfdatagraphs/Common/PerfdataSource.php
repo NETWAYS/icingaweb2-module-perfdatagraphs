@@ -108,7 +108,7 @@ class PerfdataSource
 
         // Get data from cache if it is available
         $response = $this->getDataFromCache($cacheKey, $cacheDurationInSeconds);
-
+        // When there's not cached data, load it via the hook
         if (!$response) {
             $response = $this->fetchViaHook($request);
             // Merge everything into the response.

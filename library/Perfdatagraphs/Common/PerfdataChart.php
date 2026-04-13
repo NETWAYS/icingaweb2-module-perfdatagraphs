@@ -42,6 +42,7 @@ trait PerfdataChart
      *
      * @param PerfdataRequest $request We need the request because it contains names of host/service
      * @param PerfdataResponse $response We need the response because where else would the data be?
+     * @param int $limit How many charts to render, -1 will render all charts
      * @return ValidHtml
      */
     public function createChart(PerfdataRequest $request, PerfdataResponse $response, int $limit = 3): ValidHtml

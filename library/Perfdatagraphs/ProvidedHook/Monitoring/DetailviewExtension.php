@@ -8,10 +8,10 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Ido\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
 
+use Icinga\Module\Monitoring\Hook\DetailviewExtensionHook;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
-use Icinga\Module\Monitoring\Hook\DetailviewExtensionHook;
 
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
@@ -91,6 +91,7 @@ class DetailviewExtension extends DetailviewExtensionHook
             $response->setDatasetToHighlight($customvars[$cvh::CUSTOM_VAR_CONFIG_HIGHLIGHT] ?? '');
         }
 
+        // When there are explicit includes/excludes we show all graphs, otherwise just some
         $limit = (count($metricsToInclude) > 0 || count($metricsToExclude) > 0) ? -1 : 3;
         $chart = $this->createChart($request, $response, $limit);
 

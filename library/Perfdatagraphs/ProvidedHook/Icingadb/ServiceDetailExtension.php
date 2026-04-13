@@ -3,10 +3,10 @@
 namespace Icinga\Module\Perfdatagraphs\ProvidedHook\Icingadb;
 
 use Icinga\Module\Perfdatagraphs\Common\ModuleConfig;
-use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper;
+use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
 
 use Icinga\Module\Icingadb\Hook\ServiceDetailExtensionHook;
 use Icinga\Module\Icingadb\Model\Service;
@@ -86,6 +86,7 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
             $response->setDatasetToHighlight($customvars[$cvh::CUSTOM_VAR_CONFIG_HIGHLIGHT] ?? '');
         }
 
+        // When there are explicit includes/excludes we show all graphs, otherwise just some
         $limit = (count($metricsToInclude) > 0 || count($metricsToExclude) > 0) ? -1 : 3;
         $chart = $this->createChart($request, $response, $limit);
 

@@ -27,6 +27,13 @@ class GraphController extends CompatController
 
     protected bool $disableDefaultAutoRefresh = true;
 
+    protected function addError(string $message): void
+    {
+        $err = Html::tag('div');
+        $err->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $message));
+        $this->addContent($err);
+    }
+
     /**
      * Initialize the Controller.
      */
@@ -72,9 +79,7 @@ class GraphController extends CompatController
         $object = $cvh->getObjectFromString($hostName, $serviceName, $isHostCheck);
 
         if (empty($object)) {
-            $err = Html::tag('div');
-            $err->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $this->translate('Failed to find object from given host-service strings')));
-            $this->addContent($err);
+            $this->addError($this->translate('Failed to find object from given host-service strings'));
             return;
         }
 
@@ -88,9 +93,7 @@ class GraphController extends CompatController
         }
         // If there is no hook configured we return here.
         if (empty($hook)) {
-            $err = Html::tag('div');
-            $err->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $this->translate('No hook configured.')));
-            $this->addContent($err);
+            $this->addError($this->translate('No hook configured'));
             return;
         }
 
@@ -105,9 +108,7 @@ class GraphController extends CompatController
         $chart = $this->createChart($request, $response, -1);
 
         if (empty($chart)) {
-            $err = Html::tag('div');
-            $err->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $this->translate('Chart could be rendered.')));
-            $this->addContent($err);
+            $this->addError($this->translate('Chart could not be renderd'));
             return;
         }
 
