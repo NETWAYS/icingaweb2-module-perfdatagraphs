@@ -101,13 +101,15 @@ class DetailviewExtension extends DetailviewExtensionHook
             return $err;
         }
 
+        $isHostCheck = $isHostCheck === true ? 'true' : 'false';
+
         $link = new Link(
             $this->translate('Show all performance data graphs'),
             Url::fromPath('perfdatagraphs/graphs')->addParams([
                 'host' => $hostName,
                 'service' => $serviceName,
                 'checkcommand' => $checkCommandName,
-                'ishostcheck' => 'false'
+                'ishostcheck' => $isHostCheck,
             ]),
         );
 
