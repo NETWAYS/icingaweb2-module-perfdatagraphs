@@ -74,8 +74,16 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
             $duration = Url::fromRequest()->getParam('perfdatagraphs.duration');
         }
 
-        $source = new PerfdataSource($config, $hook);
-        $request = new PerfdataRequest($hostName, $serviceName, $checkCommandName, $duration, $isHostCheck, $metricsToInclude, $metricsToExclude);
+        $source = new PerfdataSource(config: $config, hook: $hook);
+        $request = new PerfdataRequest(
+            hostName: $hostName,
+            serviceName: $serviceName,
+            checkCommand: $checkCommandName,
+            duration: $duration,
+            isHostCheck: $isHostCheck,
+            includeMetrics: $metricsToInclude,
+            excludeMetrics: $metricsToExclude
+        );
 
         $customVarsMetrics = $cvh->getPerfdataGraphsMetricsForObject($service);
 

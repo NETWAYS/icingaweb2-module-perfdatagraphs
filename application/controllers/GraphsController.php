@@ -106,7 +106,7 @@ class GraphsController extends CompatController
             $metricsToExclude = $customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE];
         }
 
-        $source = new PerfdataSource($config, $hook);
+        $source = new PerfdataSource(config: $config, hook: $hook);
         $request = new PerfdataRequest(
             hostName: $hostName,
             serviceName: $serviceName,
