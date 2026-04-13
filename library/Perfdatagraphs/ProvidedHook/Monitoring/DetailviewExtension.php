@@ -103,7 +103,7 @@ class DetailviewExtension extends DetailviewExtensionHook
 
         $link = new Link(
             $this->translate('Show all performance data graphs'),
-            Url::fromPath('perfdatagraphs/graph')->addParams([
+            Url::fromPath('perfdatagraphs/graphs')->addParams([
                 'host' => $hostName,
                 'service' => $serviceName,
                 'checkcommand' => $checkCommandName,

@@ -19,9 +19,9 @@ use ipl\Html\Html;
 use ipl\Web\Compat\CompatController;
 
 /**
- * GraphController shows all performance data charts for a given Host/Service
+ * GraphsController shows all performance data charts for a given Host/Service
  */
-class GraphController extends CompatController
+class GraphsController extends CompatController
 {
     use PerfdataChart;
 
