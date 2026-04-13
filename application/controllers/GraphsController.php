@@ -100,8 +100,22 @@ class GraphsController extends CompatController
             return;
         }
 
+        // We always remove the excluded metrics since the user has disabled them on purpose
+        $metricsToExclude = [];
+        if ($customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE] ?? false) {
+            $metricsToExclude = $customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE];
+        }
+
         $source = new PerfdataSource($config, $hook);
-        $request = new PerfdataRequest($hostName, $serviceName, $checkcommandName, $duration, $isHostCheck, [], []);
+        $request = new PerfdataRequest(
+            hostName: $hostName,
+            serviceName: $serviceName,
+            checkCommand: $checkcommandName,
+            duration: $duration,
+            isHostCheck: $isHostCheck,
+            includeMetrics: [],
+            excludeMetrics: $metricsToExclude
+        );
 
         $customVarsMetrics = $cvh->getPerfdataGraphsMetricsForObject($object);
 
