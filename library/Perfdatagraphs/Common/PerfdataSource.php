@@ -4,14 +4,8 @@ namespace Icinga\Module\Perfdatagraphs\Common;
 
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataResponse;
-use Icinga\Module\Perfdatagraphs\Common\ModuleConfig;
-use Icinga\Module\Perfdatagraphs\ProvidedHook\Icingadb\IcingadbSupport;
-
-use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper as IcinaDBCVH;
-use Icinga\Module\Perfdatagraphs\Ido\IcingaObjectHelper as IdoCVH;
 
 use Icinga\Application\Benchmark;
-use Icinga\Application\Modules\Module;
 use Icinga\Application\Logger;
 
 use Exception;
@@ -22,19 +16,23 @@ use Exception;
  */
 class PerfdataSource
 {
-    // This Module's configuration
+    // This Module's config
     protected $config;
 
     // This Module's FileCache
     protected $cache;
 
+    // The Hook to use
+    protected $hook;
+
     /**
      * @param $config the module's configuration
+     * @param $hook the backend hook to use
      */
-    public function __construct($config)
+    public function __construct($config, $hook)
     {
         $this->config = $config;
-
+        $this->hook = $hook;
         $this->cache = PerfdataCache::instance('perfdatagraphs');
     }
 
@@ -44,7 +42,7 @@ class PerfdataSource
      * @param string $cacheKey The key for this cache
      * @param int $duration How long the cached data is valid
      */
-    public function getDataFromCache(string $cacheKey, int $duration): array|false
+    public function getDataFromCache(string $cacheKey, int $duration): PerfdataResponse|false
     {
         // Check the cache for existing data
         if ($cacheKey !== null && $duration > 0) {
@@ -63,104 +61,62 @@ class PerfdataSource
      * storeDataToCache stores the given data to the module's FileCache
      *
      * @param string $cacheKey The key for this cache
-     * @param array $datasets The list of data to store. We mainly use this to store the JSON encoded datasets,
+     * @param PerfdataResponse $data The list of data to store. We mainly use this to store the JSON encoded datasets,
      * so that we don't have to encode them again. There might still be a bit of overhead with the serialize().
      */
-    public function storeDataToCache(string $cacheKey, array $datasets): void
+    public function storeDataToCache(string $cacheKey, PerfdataResponse $data): void
     {
         Logger::debug('Storing data in cache for ' . $cacheKey);
-        $this->cache->store($cacheKey, serialize($datasets));
+        $this->cache->store($cacheKey, serialize($data));
+    }
+
+    /**
+     */
+    public function fetchViaHook(PerfdataRequest $request): PerfdataResponse
+    {
+        Benchmark::measure('Fetching performance data');
+        $response = new PerfdataResponse();
+
+        try {
+            $response = $this->hook->fetchData($request);
+        } catch (Exception $e) {
+            $err = sprintf('Failed to call PerfdataSource hook: %s', $e->getMessage());
+            Logger::error($err);
+            $response->addError($err);
+            return $response;
+        } finally {
+            Benchmark::measure('Fetched performance data');
+        }
+
+        return $response;
     }
 
     /**
      * fetchDataViaHook calls the configured PerfdataSourceHook to fetch the perfdata from the backend.
      *
-     * @param string $host Name of the host
-     * @param string $service Name of the service
-     * @param string $checkcommand Name of the checkcommand
-     * @param string $duration Duration for which to fetch the data
-     * @param bool $isHostCheck Is this a Host check
+     * @param PerfdataRequest $request Request we use to fetch the data for
+     * @param array $customVarsMetrics customvars for the metrics that are then merged
      *
      * @return PerfdataResponse
      */
-    public function fetchDataViaHook(string $host, string $service, string $checkcommand, string $duration, bool $isHostCheck): PerfdataResponse
+    public function fetch(PerfdataRequest $request, array $customVarsMetrics): PerfdataResponse
     {
-        $response = new PerfdataResponse();
+        // TODO: We could use the HTTP Cache-Control Header to invalidate cache
+        $cacheDurationInSeconds = $this->config['cache_lifetime'];
+        $h = $request->isHostCheck() ? 'true': 'false';
+        $cacheKey = base64_encode($request->getHostname() . $request->getServicename() . $request->getCheckcommand() . $request->getDuration() . $h);
 
-        Benchmark::measure('Fetching performance data');
-
-        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            Logger::debug('Used IcingaDB as database backend');
-            $cvh = new IcinaDBCVH();
-        } else {
-            Logger::debug('Used IDO as database backend');
-            $cvh = new IdoCVH();
+        // Get data from cache if it is available
+        $response = $this->getDataFromCache($cacheKey, $cacheDurationInSeconds);
+        // When there's not cached data, load it via the hook
+        if (!$response) {
+            $response = $this->fetchViaHook($request);
+            // Merge everything into the response.
+            // We could have also done this browser-side but decided to do this here
+            // because of simpler testability.
+            $response->mergeCustomVars($customVarsMetrics);
+            $this->storeDataToCache($cacheKey, $response);
         }
-
-        // Get the object so that we can get its custom variables.
-        $object = $cvh->getObjectFromString($host, $service, $isHostCheck);
-
-        // If there's no object we can just stop here.
-        if (empty($object)) {
-            Logger::warning('Failed to find object from given host-service strings');
-            return $response;
-        }
-
-        // Load the custom variables for the metrics to include and exclude
-        $customvars = $cvh->getPerfdataGraphsConfigForObject($object);
-
-        $metricsToInclude = [];
-        if ($customvars[$cvh::CUSTOM_VAR_CONFIG_INCLUDE] ?? false) {
-            $metricsToInclude = $customvars[$cvh::CUSTOM_VAR_CONFIG_INCLUDE];
-        }
-
-        $metricsToExclude = [];
-        if ($customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE] ?? false) {
-            $metricsToExclude = $customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE];
-        }
-
-        // If the object wants the data from a custom backend
-        if ($customvars[$cvh::CUSTOM_VAR_CONFIG_BACKEND] ?? false) {
-            $hook = ModuleConfig::getHookByName($customvars[$cvh::CUSTOM_VAR_CONFIG_BACKEND]);
-        } else {
-            /** @var PerfdataSourceHook $hook */
-            $hook = ModuleConfig::getHook();
-        }
-
-        // If there is no hook configured we return here.
-        if (empty($hook)) {
-            Logger::error('No valid PerfdataSource hook configured');
-            $response->addError('No valid PerfdataSource hook configured');
-            return $response;
-        }
-
-        // Create a new PerfdataRequest with the given parameters and custom variables
-        $request = new PerfdataRequest($host, $service, $checkcommand, $duration, $isHostCheck, $metricsToInclude, $metricsToExclude);
-
-        // Try to fetch the data with the hook.
-        try {
-            $response = $hook->fetchData($request);
-        } catch (Exception $e) {
-            $err = sprintf('Failed to call PerfdataSource hook: %s', $e->getMessage());
-            Logger::error($err);
-            $response->addError($err);
-
-            return $response;
-        }
-
-        // Merge everything into the response.
-        // We could have also done this browser-side but decided to do this here
-        // because of simpler testability.
-        $customVarsMetrics = $cvh->getPerfdataGraphsMetricsForObject($object);
-
-        $response->mergeCustomVars($customVarsMetrics);
-
-        // If the a dataset is set to be highlighted, move it at the top of the array.
-        if ($customvars[$cvh::CUSTOM_VAR_CONFIG_HIGHLIGHT] ?? false) {
-            $response->setDatasetToHighlight($customvars[$cvh::CUSTOM_VAR_CONFIG_HIGHLIGHT] ?? '');
-        }
-
-        Benchmark::measure('Fetched performance data');
 
         return $response;
     }

@@ -31,7 +31,7 @@ Note that hyphens are currently not allowed in Icinga Web module directories. Ex
 /usr/share/icingaweb2/modules/perfdatagraphsgraphite/
 /usr/share/icingaweb2/modules/perfdatagraphsinfluxdbv1/
 /usr/share/icingaweb2/modules/perfdatagraphsinfluxdbv2/
-/usr/share/icingaweb2/modules/perfdatagraphsinfluxdbv3/
+/usr/share/icingaweb2/modules/perfdatagraphspromtheus/
 /usr/share/icingaweb2/modules/perfdatagraphselasticsearch/
 /usr/share/icingaweb2/modules/perfdatagraphsopensearch/
 ```
