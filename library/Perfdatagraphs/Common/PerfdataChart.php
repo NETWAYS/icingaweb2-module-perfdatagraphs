@@ -18,7 +18,7 @@ use ipl\Web\Url;
 
 /**
  * PerfdataChart contains common functionality used for rendering the performance data charts.
- * The idea is that you use this in the hook to create the chart elements.
+ * The idea is that you use this to create the chart elements.
  */
 trait PerfdataChart
 {
@@ -42,10 +42,11 @@ trait PerfdataChart
      *
      * @param PerfdataRequest $request We need the request because it contains names of host/service
      * @param PerfdataResponse $response We need the response because where else would the data be?
+     * @param array $filter Only show graphs with these labels
      * @param int $limit How many charts to render, -1 will render all charts
      * @return ValidHtml
      */
-    public function createChart(PerfdataRequest $request, PerfdataResponse $response, int $limit = 3): ValidHtml
+    public function createChart(PerfdataRequest $request, PerfdataResponse $response, array $filter = [], int $limit = 3): ValidHtml
     {
         // Generic container for all elements we want to create here.
         $main = HtmlElement::create('div', ['class' => 'perfdata-charts']);
@@ -115,6 +116,12 @@ trait PerfdataChart
 
         $datasets = [];
         foreach ($response->getDatasets() as $dataset) {
+            // If the filter param is set, we only use the dataset when the label matches
+            if (count($filter) > 0) {
+                if (!in_array($dataset->getTitle(), $filter)) {
+                    continue;
+                }
+            }
             $datasets[$dataset->getTitle()] = Json::sanitize($dataset);
         }
 

@@ -64,6 +64,9 @@ class GraphController extends CompatController
         $checkcommandName = $this->params->getRequired('checkcommand');
         $isHostCheck = $this->params->getRequired('ishostcheck');
 
+        // Optional list of labels, when passed only the given perfdata metrics will be shown
+        $labels = $this->params->getValues('label');
+
         // Transform the URL param into a boolean just because it is easier to work with
         $isHostCheck = $isHostCheck === 'true' ? true : false;
 
@@ -104,8 +107,8 @@ class GraphController extends CompatController
 
         $response = $source->fetch($request, $customVarsMetrics);
 
-        // Get the configured element for the host.
-        $chart = $this->createChart($request, $response, -1);
+        $limit = -1;
+        $chart = $this->createChart(request: $request, response: $response, filter: $labels, limit: $limit);
 
         if (empty($chart)) {
             $this->addError($this->translate('Chart could not be renderd'));
