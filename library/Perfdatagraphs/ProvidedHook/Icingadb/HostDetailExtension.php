@@ -87,7 +87,7 @@ class HostDetailExtension extends HostDetailExtensionHook
         }
 
         // When there are explicit includes/excludes we show all graphs, otherwise just some
-        $limit = (count($metricsToInclude) > 0 || count($metricsToExclude) > 0) ? -1 : 3;
+        $limit = (count($metricsToInclude) > 0 || count($metricsToExclude) > 0) ? -1 : $config['minimum_chart_count'];
         $chart = $this->createChart(request: $request, response: $response, limit: $limit);
 
         if (empty($chart)) {

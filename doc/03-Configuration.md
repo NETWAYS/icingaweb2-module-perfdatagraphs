@@ -1,12 +1,20 @@
 # Configuration
 
-This describes the configuration options for this module.
+This describes the configuration options for this module (`/etc/icingaweb2/modules/perfdatagraphs/config.ini`):
 
-```
-cat /etc/icingaweb2/modules/perfdatagraphs/config.ini
+```ini
 [perfdatagraphs]
+# Default time range for the "Current" button. Uses the ISO8601 duration format (e.g. PT2H, P1D). Hint: too small a value may result in invalid data
 default_timerange = "PT12H"
+
+# This number is the minimum count of charts to be rendered on the object page. This can be overridden with the "metrics_include" variable'
+minimum_chart_count = 3
+
+# Default backend for the performance data graphs. With only one backend is installed, it will be used by default.
 default_backend = "Graphite"
+
+# How long the data for the charts will be cached by the server.
+cache_lifetime = 9000
 ```
 
 Each individual "backend" module, which is responsible for fetching the data from a performance data backend (Graphite, OpenSearch, Elasticsearch, InfluxDB, etc.), provides its own configuration options.

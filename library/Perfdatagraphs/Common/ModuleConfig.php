@@ -86,6 +86,7 @@ class ModuleConfig
         $default = [
             'cache_lifetime' => 900,
             'default_timerange' => 'PT12H',
+            'minimum_chart_count' => 3,
         ];
 
         // Try to load the configuration
@@ -101,6 +102,7 @@ class ModuleConfig
 
         $config = [];
         $config['cache_lifetime'] = (int) $moduleConfig->get('perfdatagraphs', 'cache_lifetime', $default['cache_lifetime']);
+        $config['minimum_chart_count'] = (int) $moduleConfig->get('perfdatagraphs', 'minimum_chart_count', $default['minimum_chart_count']);
         $config['default_timerange'] = $moduleConfig->get('perfdatagraphs', 'default_timerange', $default['default_timerange']);
 
         return $config;

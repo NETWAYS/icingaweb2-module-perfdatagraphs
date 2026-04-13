@@ -67,6 +67,12 @@ class PerfdataGraphsConfigForm extends ConfigForm
             ],
         ]);
 
+        $this->addElement('number', 'perfdatagraphs_minimum_chart_count', [
+            'label' => t('Minimum count of charts to be rendered on the object page'),
+            'description' => t('This number is the minimum count of charts to be rendered on the object page. This can be overridden with the "metrics_include" variable'),
+            'placeholder' => 3,
+        ]);
+
         $this->addElement('number', 'perfdatagraphs_cache_lifetime', [
             'label' => t('Cache lifetime in seconds'),
             'description' => t('How long the data for the charts will be cached by the server.'),
