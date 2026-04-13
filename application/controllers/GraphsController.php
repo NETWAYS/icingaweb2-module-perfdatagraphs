@@ -62,6 +62,7 @@ class GraphsController extends CompatController
         $hostName = $this->params->getRequired('host');
         $serviceName = $this->params->getRequired('service');
         $checkcommandName = $this->params->getRequired('checkcommand');
+        $checkInterval = intval($this->params->getRequired('checkinterval'));
         $isHostCheck = $this->params->getRequired('ishostcheck');
 
         // Optional list of labels, when passed only the given perfdata metrics will be shown
@@ -111,6 +112,7 @@ class GraphsController extends CompatController
             hostName: $hostName,
             serviceName: $serviceName,
             checkCommand: $checkcommandName,
+            checkInterval: $checkInterval,
             duration: $duration,
             isHostCheck: $isHostCheck,
             includeMetrics: [],

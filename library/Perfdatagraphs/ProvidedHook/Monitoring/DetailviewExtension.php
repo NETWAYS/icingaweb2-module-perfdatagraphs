@@ -30,11 +30,13 @@ class DetailviewExtension extends DetailviewExtensionHook
             $serviceName = $object->host_check_command;
             $hostName = $object->getName();
             $checkCommandName = $object->host_check_command;
+            $checkInterval = intval($object->host_check_interval);
             $isHostCheck = true;
         } elseif ($object instanceof Service) {
             $serviceName = $object->getName();
             $hostName = $object->getHost()->getName();
             $checkCommandName = $object->check_command;
+            $checkInterval = intval($object->service_check_interval);
         } else {
             // Unecessary but just to be safe.
             return Html::tag('div');
@@ -84,6 +86,7 @@ class DetailviewExtension extends DetailviewExtensionHook
             hostName: $hostName,
             serviceName: $serviceName,
             checkCommand: $checkCommandName,
+            checkInterval: $checkInterval,
             duration: $duration,
             isHostCheck: $isHostCheck,
             includeMetrics: $metricsToInclude,
@@ -117,6 +120,7 @@ class DetailviewExtension extends DetailviewExtensionHook
                 'host' => $hostName,
                 'service' => $serviceName,
                 'checkcommand' => $checkCommandName,
+                'checkinterval' => $checkInterval,
                 'ishostcheck' => $isHostCheck,
             ]),
         );

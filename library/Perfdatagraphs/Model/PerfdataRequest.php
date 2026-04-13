@@ -27,6 +27,7 @@ class PerfdataRequest
      * @param string $hostName host name for the performance data query
      * @param string $serviceName service name for the performance data query
      * @param string $checkCommand checkcommand name for the performance data query
+     * @param int $checkInterval checkinterval for the performance data query
      * @param string $duration for which to fetch the data for in PHP's DateInterval format (e.g. PT12H, P1D, P1Y)
      * @param bool $isHostCheck is this a Host or Service Check that is requested. Backends queries might differ for these.
      * @param array $includeMetrics a list of metrics that are requested, if not set all available metrics should be returned
@@ -36,6 +37,7 @@ class PerfdataRequest
         string $hostName,
         string $serviceName,
         string $checkCommand,
+        int $checkInterval,
         string $duration,
         bool $isHostCheck,
         array $includeMetrics = [],
@@ -44,6 +46,7 @@ class PerfdataRequest
         $this->hostName = $hostName;
         $this->serviceName = $serviceName;
         $this->checkCommand = $checkCommand;
+        $this->checkInterval = $checkInterval;
         $this->duration = $duration;
         $this->isHostCheck = $isHostCheck;
         $this->includeMetrics = $includeMetrics;
@@ -63,6 +66,11 @@ class PerfdataRequest
     public function getCheckcommand(): string
     {
         return $this->checkCommand;
+    }
+
+    public function getCheckInterval(): int
+    {
+        return $this->checkInterval;
     }
 
     public function getDuration(): string

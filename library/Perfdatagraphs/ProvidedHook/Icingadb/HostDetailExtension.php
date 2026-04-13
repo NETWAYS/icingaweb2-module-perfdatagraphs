@@ -32,6 +32,7 @@ class HostDetailExtension extends HostDetailExtensionHook
         $serviceName = $host->checkcommand_name ?? '';
         $hostName = $host->name ?? '';
         $checkCommandName = $host->checkcommand_name ?? '';
+        $checkInterval = $host->check_interval;
 
         $cvh = new IcingaObjectHelper();
         $customvars = $cvh->getPerfdataGraphsConfigForObject($host);
@@ -79,6 +80,7 @@ class HostDetailExtension extends HostDetailExtensionHook
             hostName: $hostName,
             serviceName: $serviceName,
             checkCommand: $checkCommandName,
+            checkInterval: $checkInterval,
             duration: $duration,
             isHostCheck: $isHostCheck,
             includeMetrics: $metricsToInclude,
@@ -110,6 +112,7 @@ class HostDetailExtension extends HostDetailExtensionHook
                 'host' => $hostName,
                 'service' => $serviceName,
                 'checkcommand' => $checkCommandName,
+                'checkinterval' => $checkInterval,
                 'ishostcheck' => 'true'
             ]),
         );
