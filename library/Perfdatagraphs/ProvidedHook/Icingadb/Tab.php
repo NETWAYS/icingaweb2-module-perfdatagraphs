@@ -29,7 +29,7 @@ class Tab extends TabHook
 
     public function getLabel(): string
     {
-        return t('All graphs');
+        return t('Performance Data Graph');
     }
 
     protected function addError(string $message): HtmlElement
@@ -60,13 +60,9 @@ class Tab extends TabHook
 
         // Retrieve the URL parameters.
         $duration = $request->getParam('perfdatagraphs_duration', $defaultDuration);
-        $headline = $request->getParam('perfdatagraphs_headline', $this->translate('Performance Data Graph'));
 
         // Optional list of labels, when passed only the given perfdata metrics will be shown
         $labels = $request->getParam('labels', []);
-
-        $header = Html::tag('h2', $headline);
-        $content[] = $header;
 
         if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
             Logger::debug('Used IcingaDB as database backend');
