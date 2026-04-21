@@ -16,7 +16,6 @@ use Icinga\Module\Monitoring\Object\Service;
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Web\Url;
-use ipl\Web\Widget\Link;
 
 class DetailviewExtension extends DetailviewExtensionHook
 {
@@ -106,21 +105,9 @@ class DetailviewExtension extends DetailviewExtensionHook
         $headline = $this->translate('Performance Data Graph');
         $header = Html::tag('h2', $headline);
 
-        $link = new Link(
-            $this->translate('Show all performance data graphs'),
-            Url::fromPath('perfdatagraphs/graphs')->addParams([
-                'host' => $hostName,
-                'service' => $serviceName,
-                'checkcommand' => $checkCommandName,
-                'ishostcheck' => $isHostCheck,
-                'perfdatagraphs.headline' => $headline
-            ]),
-        );
-
         $d = Html::tag('div');
         $d->add($header);
         $d->add($chart);
-        $d->add($link);
 
         return $d;
     }

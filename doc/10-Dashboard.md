@@ -2,7 +2,9 @@
 
 The module offers a dedicated page for graphs that can be used on an Icinga Web Dashboard.
 
-This page is available at `perfdatagraphs/graphs`.
+This page is available at `icingadb/host/graphs?name=yourHostName` for Hosts and at `icingadb/service/graphs?name=yourServiceName&host.name=yourHostName` for Service
+or `monitoring/host/tabhook?host=yourHostName&hook=graphs` or `monitoring/service/tabhook?host=yourHostName&service=yourServiceName&hook=graphs` depending if you use the icingadb or monitoring module.
+
 
 HTTP parameters are used to managed what is rendered:
 
@@ -19,12 +21,10 @@ HTTP parameters are used to managed what is rendered:
 
 Example:
 
+IcingaDB Host
 ```
-http://icingaweb2.internal/perfdatagraphs/graphs
- ?host=example
- &service=http
- &checkcommand=http
- &ishostcheck=false
+http://icingaweb2.internal/icingadb/host/graphs
+ ?name=example
  &perfdatagraphs.duration=P1D
  &perfdatagraphs.headline=Example Host HTTP Service
  &label=time&label=size

@@ -15,7 +15,6 @@ use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\ValidHtml;
 use ipl\Web\Url;
-use ipl\Web\Widget\Link;
 
 /**
  * HostDetailExtension adds the Chart HTML for Host objects.
@@ -99,21 +98,9 @@ class HostDetailExtension extends HostDetailExtensionHook
         $headline = $this->translate('Performance Data Graph');
         $header = Html::tag('h2', $headline);
 
-        $link = new Link(
-            $this->translate('Show all performance data graphs'),
-            Url::fromPath('perfdatagraphs/graphs')->addParams([
-                'host' => $hostName,
-                'service' => $serviceName,
-                'checkcommand' => $checkCommandName,
-                'ishostcheck' => 'true',
-                'perfdatagraphs.headline' => $headline
-            ]),
-        );
-
         $d = Html::tag('div');
         $d->add($header);
         $d->add($chart);
-        $d->add($link);
 
         return $d;
     }

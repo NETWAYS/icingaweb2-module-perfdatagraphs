@@ -15,7 +15,6 @@ use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\ValidHtml;
 use ipl\Web\Url;
-use ipl\Web\Widget\Link;
 
 /**
  * ServiceDetailExtension adds the Chart HTML for Service objects.
@@ -99,21 +98,9 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
         $headline = $this->translate('Performance Data Graph');
         $header = Html::tag('h2', $headline);
 
-        $link = new Link(
-            $this->translate('Show all performance data graphs'),
-            Url::fromPath('perfdatagraphs/graphs')->addParams([
-                'host' => $hostName,
-                'service' => $serviceName,
-                'checkcommand' => $checkCommandName,
-                'ishostcheck' => 'false',
-                'perfdatagraphs.headline' => $headline
-            ]),
-        );
-
         $d = Html::tag('div');
         $d->add($header);
         $d->add($chart);
-        $d->add($link);
 
         return $d;
     }
