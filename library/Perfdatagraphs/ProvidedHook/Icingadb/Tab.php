@@ -2,17 +2,18 @@
 
 namespace Icinga\Module\Perfdatagraphs\ProvidedHook\Icingadb;
 
-use Icinga\Application\Icinga;
-use Icinga\Application\Logger;
-use Icinga\Application\Modules\Module;
-use Icinga\Module\Icingadb\Hook\TabHook;
-use Icinga\Module\Icingadb\Model\Host;
-use Icinga\Module\Icingadb\Model\Service;
 use Icinga\Module\Perfdatagraphs\Common\ModuleConfig;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+
+use Icinga\Module\Icingadb\Hook\TabHook;
+use Icinga\Module\Icingadb\Model\Host;
+use Icinga\Module\Icingadb\Model\Service;
+
+use Icinga\Application\Icinga;
+
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\HtmlString;
@@ -20,8 +21,8 @@ use ipl\Orm\Model;
 
 class Tab extends TabHook
 {
-
     use PerfdataChart;
+
     public function getName(): string
     {
         return 'graphs';
@@ -52,9 +53,9 @@ class Tab extends TabHook
             $checkcommandName = $object->checkcommand_name;
             $hostName = $object->host->name;
         }
+
         $request = Icinga::app()->getRequest();
 
-        $content = [];
         $config = ModuleConfig::getConfigWithDefaults();
         $defaultDuration = $config['default_timerange'];
 
@@ -64,10 +65,7 @@ class Tab extends TabHook
         // Optional list of labels, when passed only the given perfdata metrics will be shown
         $labels = $request->getParam('labels', []);
 
-        if (Module::exists('icingadb') && IcingadbSupport::useIcingaDbAsBackend()) {
-            Logger::debug('Used IcingaDB as database backend');
-            $cvh = new IcingaObjectHelper();
-        }
+        $cvh = new IcingaObjectHelper();
 
         $customvars = $cvh->getPerfdataGraphsConfigForObject($object);
 
@@ -77,7 +75,9 @@ class Tab extends TabHook
         } else {
             $hook = ModuleConfig::getHook();
         }
+
         // If there is no hook configured we return here.
+        $content = [];
         if (empty($hook)) {
             $content[] = $this->addError($this->translate('No hook configured'));
             return $content;
@@ -98,6 +98,7 @@ class Tab extends TabHook
             $content[] = $this->addError($this->translate('Chart could not be rendered'));
             return $content;
         }
+
         return $content;
     }
 }

@@ -2,27 +2,27 @@
 
 namespace Icinga\Module\PerfdataGraphs\ProvidedHook\Monitoring;
 
-use Icinga\Application\Logger;
-use Icinga\Application\Modules\Module;
-use Icinga\Module\Monitoring\Object\Host;
-use Icinga\Module\Monitoring\Object\Service;
 use Icinga\Module\Perfdatagraphs\Common\ModuleConfig;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Ido\IcingaObjectHelper as IdoCVH;
-use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper as IcinaDBCVH;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
-use Icinga\Module\Perfdatagraphs\ProvidedHook\Icingadb\IcingadbSupport;
+
+use Icinga\Module\Monitoring\Hook\ObjectDetailsTabHook;
+use Icinga\Module\Monitoring\Object\Host;
+use Icinga\Module\Monitoring\Object\MonitoredObject;
+use Icinga\Module\Monitoring\Object\Service;
+
+use Icinga\Web\Request;
+
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\HtmlString;
-use Icinga\Module\Monitoring\Object\MonitoredObject;
-use Icinga\Web\Request;
-use Icinga\Module\Monitoring\Hook\ObjectDetailsTabHook;
 
 class ObjectDetailsTab extends ObjectDetailsTabHook
 {
     use PerfdataChart;
+
     public function getName()
     {
         return "graphs";
@@ -39,7 +39,6 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
         $err->add(HtmlElement::create('p', ['class' => 'line-chart-error preformatted'], $message));
         return $err;
     }
-
 
     public function getContent(MonitoredObject $object, Request $request)
     {
@@ -58,7 +57,6 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
             return Html::tag('div');
         }
 
-        $content = "";
         $config = ModuleConfig::getConfigWithDefaults();
         $defaultDuration = $config['default_timerange'];
         // Retrieve the URL parameters.
@@ -67,7 +65,6 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
         // Optional list of labels, when passed only the given perfdata metrics will be shown
         $labels = $request->getParam('labels', []);
 
-        Logger::debug('Used IDO as database backend');
         $cvh = new IdoCVH();
 
         $customvars = $cvh->getPerfdataGraphsConfigForObject($object);
@@ -78,6 +75,7 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
         } else {
             $hook = ModuleConfig::getHook();
         }
+
         // If there is no hook configured we return here.
         if (empty($hook)) {
             return $this->addError($this->translate('No hook configured'));
@@ -92,11 +90,11 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
 
         $limit = -1;
         $chart = $this->createChart(request: $newRequest, response: $response, filter: $labels, limit: $limit);
-        $content = $content . $chart;
 
         if (empty($chart)) {
             return $this->addError($this->translate('Chart could not be rendered'));
         }
-        return Html::tag('div', ['class' => 'icinga-module module-perfdatagraphs'], HtmlString::create($content));
+
+        return Html::tag('div', ['class' => 'icinga-module module-perfdatagraphs'], HtmlString::create($chart));
     }
 }
