@@ -100,6 +100,31 @@ so the user can choose which metrics to display.
             color: white;
         }
     }
+    .metric-selector-actions {
+        margin-top: .5em;
+        display: flex;
+        gap: .5em;
+
+        button {
+            padding: .25em .75em;
+            .rounded-corners(.25em);
+            border: 1px solid @gray-semilight;
+            cursor: pointer;
+            font-size: .85em;
+
+            &.metric-selector-apply {
+                background: @color-pending;
+                border-color: @color-pending;
+                color: white;
+                &:hover { opacity: .85; }
+            }
+
+            &.metric-selector-clear {
+                background: @gray-lighter;
+                &:hover { background: @gray-semilight; }
+            }
+        }
+    }
 }
 
 /*
