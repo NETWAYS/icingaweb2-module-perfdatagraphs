@@ -53,6 +53,7 @@ class MetricSelector extends BaseHtmlElement
 
         $list = Html::tag('ul', ['class' => 'metric-selector-list']);
 
+        $index = 0;
         foreach ($this->availableLabels as $label) {
             $isSelected = in_array($label, $this->selectedLabels, true);
 
