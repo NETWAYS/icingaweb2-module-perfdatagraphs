@@ -49,6 +49,60 @@ p.line-chart-error {
 }
 
 /*
+Metric selector: toggleable links shown above the charts
+so the user can choose which metrics to display.
+*/
+.perfdatagraphs-metric-selector {
+    margin-bottom: 1.5em;
+    padding-bottom: .75em;
+    border-bottom: 1px solid @gray-lighter;
+
+    .metric-selector-title {
+        margin: 0 0 .5em 0;
+        font-size: .8em;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        color: @gray;
+    }
+
+    .metric-selector-list {
+        display: flex;
+        flex-wrap: wrap;
+        list-style: none;
+        margin: 0 -.25em;
+        padding: 0;
+
+        li {
+            margin: 0 .25em .4em;
+        }
+    }
+
+    a.metric-label-link {
+        display: inline-block;
+        padding: .2em .65em;
+        .rounded-corners(.25em);
+        border: 1px solid @gray-lighter;
+        background: @gray-lighter;
+        font-size: .85em;
+        text-decoration: none;
+        color: inherit;
+        white-space: nowrap;
+
+        &:hover {
+            border-color: @gray-semilight;
+            background: @gray-semilight;
+        }
+
+        &.selected {
+            background: @color-pending;
+            border-color: @color-pending;
+            color: white;
+        }
+    }
+}
+
+/*
 The spinner for when data is being fetched
 */
 i.spinner {
