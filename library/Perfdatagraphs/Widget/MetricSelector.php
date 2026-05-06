@@ -40,6 +40,11 @@ class MetricSelector extends BaseHtmlElement
             return;
         }
 
+        // data-base-url lets the JS reconstruct URLs for range selections
+        $this->addAttributes([
+            'data-base-url' => $this->baseUrl->without('perfdatagraphs.label')->getAbsoluteUrl(),
+        ]);
+
         $this->add(Html::tag(
             'p',
             ['class' => 'metric-selector-title'],
@@ -75,9 +80,12 @@ class MetricSelector extends BaseHtmlElement
             }
 
             $list->add(Html::tag('li', Html::tag('a', [
-                'href'  => $urlStr,
-                'class' => 'metric-label-link' . ($isSelected ? ' selected' : ''),
+                'href'        => $urlStr,
+                'class'       => 'metric-label-link' . ($isSelected ? ' selected' : ''),
+                'data-label'  => $label,
+                'data-index'  => $index,
             ], $label)));
+            $index++;
         }
 
         $this->add($list);
