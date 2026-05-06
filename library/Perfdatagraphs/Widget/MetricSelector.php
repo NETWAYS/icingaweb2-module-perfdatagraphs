@@ -57,38 +57,21 @@ class MetricSelector extends BaseHtmlElement
         foreach ($this->availableLabels as $label) {
             $isSelected = in_array($label, $this->selectedLabels, true);
 
-            // Build the new set of selected labels after this toggle
-            if ($isSelected) {
-                $newLabels = array_values(array_filter(
-                    $this->selectedLabels,
-                    fn($l) => $l !== $label
-                ));
-            } else {
-                $newLabels = array_merge($this->selectedLabels, [$label]);
-            }
-
-            // Start from the base URL with all existing label params stripped
-            $urlStr = $this->baseUrl->without('perfdatagraphs.label')->getAbsoluteUrl();
-
-            // Append each desired label as a separate query param
-            if (!empty($newLabels)) {
-                $separator  = strpos($urlStr, '?') !== false ? '&' : '?';
-                $queryParts = array_map(
-                    fn($l) => 'perfdatagraphs.label=' . rawurlencode($l),
-                    $newLabels
-                );
-                $urlStr .= $separator . implode('&', $queryParts);
-            }
-
             $list->add(Html::tag('li', Html::tag('a', [
-                'href'        => $urlStr,
-                'class'       => 'metric-label-link' . ($isSelected ? ' selected' : ''),
-                'data-label'  => $label,
-                'data-index'  => $index,
+                'href'       => '#',
+                'class'      => 'metric-label-link' . ($isSelected ? ' selected' : ''),
+                'data-label' => $label,
+                'data-index' => $index,
             ], $label)));
             $index++;
         }
 
         $this->add($list);
+        $this->add(Html::tag('div', ['class' => 'metric-selector-actions'], [
+            Html::tag('button', ['class' => 'metric-selector-apply', 'type' => 'button'],
+                $this->translate('Apply')),
+            Html::tag('button', ['class' => 'metric-selector-clear', 'type' => 'button'],
+                $this->translate('Clear')),
+        ]));
     }
 }
