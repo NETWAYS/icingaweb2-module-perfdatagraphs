@@ -7,6 +7,7 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Widget\MetricSelector;
 
 use Icinga\Module\Icingadb\Hook\TabHook;
 use Icinga\Module\Icingadb\Model\Host;
@@ -14,6 +15,7 @@ use Icinga\Module\Icingadb\Model\Service;
 
 use Icinga\Application\Icinga;
 
+use ipl\Web\Url;
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\HtmlString;
@@ -108,14 +110,26 @@ class Tab extends TabHook
 
         $response = $source->fetch($request, $customVarsMetrics);
 
-        $limit = -1;
-        $chart = $this->createChart(request: $request, response: $response, filter: $labels, limit: $limit);
-        $content[] = HtmlString::create($chart);
-
-        if (empty($chart)) {
-            $content[] = $this->addError($this->translate('Chart could not be rendered'));
-            return $content;
+        // Collect all available metric labels from the response
+        $availableLabels = [];
+        foreach ($response->getDatasets() as $dataset) {
+            $availableLabels[] = $dataset->getTitle();
         }
+
+        if (!empty($availableLabels)) {
+            // Show the metric selector, charts only render once the user picks at least one
+            $content[] = new MetricSelector($availableLabels, $labels, Url::fromRequest());
+
+            if (!empty($labels)) {
+                $chart = $this->createChart(request: $request, response: $response, filter: $labels, limit: -1);
+                $content[] = HtmlString::create($chart);
+            }
+        } else {
+            // No datasets available, fall through to the standard error/empty rendering
+            $chart = $this->createChart(request: $request, response: $response, filter: $labels, limit: -1);
+            $content[] = HtmlString::create($chart);
+        }
+
 
         return $content;
     }
