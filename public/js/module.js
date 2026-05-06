@@ -599,7 +599,6 @@
 
             return nullGaps;
         }
-    }
 
         /**
          * onMetricLabelClick handles clicks on metric selector pills.
@@ -655,8 +654,8 @@
             // Update the anchor and navigate via IcingaWeb2 loader.
             _this.lastClickedMetric.set($selector[0], curIndex);
             _this.icinga.loader.loadUrl(newUrl, $a.closest('.container'));
+        }
     }
-
     Icinga.Behaviors.Perfdatagraphs = Perfdatagraphs;
 
 }(Icinga, jQuery));
