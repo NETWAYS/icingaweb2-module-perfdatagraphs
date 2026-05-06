@@ -57,6 +57,8 @@
             // TODO: The 'rendered' selectors might not yet be optimal.
             this.on('rendered', '#main > .icinga-module, #main > .container', this.rendered, this);
             this.on('click', 'a.metric-label-link', this.onMetricLabelClick, this);
+            this.on('click', 'button.metric-selector-apply', this.onMetricSelectorApply, this);
+            this.on('click', 'button.metric-selector-clear', this.onMetricSelectorClear, this);
         }
 
         /**
@@ -607,53 +609,58 @@
          */
         onMetricLabelClick(event)
         {
-            let _this = event.data.self;
-            const $a = $(event.currentTarget);
-            const $selector = $a.closest('.perfdatagraphs-metric-selector');
-            const curIndex = parseInt($a.attr('data-index'), 10);
-
-            if (!event.shiftKey) {
-                // Normal click: record this pill as the anchor for future shift+clicks.
-                // Let IcingaWeb2 handle the actual navigation.
-                _this.lastClickedMetric.set($selector[0], curIndex);
-                return;
-            }
-
-            // Shift+click: select the range from last clicked to this pill.
             event.preventDefault();
             event.stopPropagation();
 
-            const $allLinks = $selector.find('a.metric-label-link');
-            const lastIndex = _this.lastClickedMetric.has($selector[0])
-                ? _this.lastClickedMetric.get($selector[0])
-                : curIndex;
+            const _this = event.data.self;
+            const $a = $(event.currentTarget);
+            const $selector = $a.closest('.perfdatagraphs-metric-selector');
+            const curIndex = parseInt($a.attr('data-index'), 10);
+            const selectorKey = $selector.attr('data-base-url');
 
-            const from = Math.min(lastIndex, curIndex);
-            const to   = Math.max(lastIndex, curIndex);
+            if (event.shiftKey && _this.lastClickedMetric.has(selectorKey)) {
+                // Shift+click: toggle all pills in the range
+                const lastIndex = _this.lastClickedMetric.get(selectorKey);
+                const from = Math.min(lastIndex, curIndex);
+                const to   = Math.max(lastIndex, curIndex);
+                const shouldSelect = !$a.hasClass('selected');
 
-            // Start from the currently selected set and add the entire range.
-            const selected = new Set(
-                $allLinks.filter('.selected').map((_, el) => $(el).attr('data-label')).get()
-            );
-            $allLinks.each((_, el) => {
-                const idx = parseInt($(el).attr('data-index'), 10);
-                if (idx >= from && idx <= to) {
-                    selected.add($(el).attr('data-label'));
-                }
-            });
+                $selector.find('a.metric-label-link').each((_, el) => {
+                    const idx = parseInt($(el).attr('data-index'), 10);
+                    if (idx >= from && idx <= to) {
+                        $(el).toggleClass('selected', shouldSelect);
+                    }
+                });
+            } else {
+                // Normal click: toggle just this pill
+                $a.toggleClass('selected');
+            }
 
-            // Build the new URL from the base URL stored on the container.
-            const baseUrl  = $selector.attr('data-base-url');
-            const sep      = baseUrl.includes('?') ? '&' : '?';
-            const newUrl   = selected.size > 0
-                ? baseUrl + sep + Array.from(selected)
-                    .map(l => 'perfdatagraphs.label=' + encodeURIComponent(l))
-                    .join('&')
+            _this.lastClickedMetric.set(selectorKey, curIndex);
+        }
+
+        onMetricSelectorApply(event)
+        {
+            event.preventDefault();
+            const _this = event.data.self;
+            const $selector = $(event.currentTarget).closest('.perfdatagraphs-metric-selector');
+            const baseUrl = $selector.attr('data-base-url');
+
+            const selected = $selector.find('a.metric-label-link.selected')
+                .map((_, el) => $(el).attr('data-label')).get();
+
+            const sep = baseUrl.includes('?') ? '&' : '?';
+            const newUrl = selected.length > 0
+                ? baseUrl + sep + selected.map(l => 'perfdatagraphs.label=' + encodeURIComponent(l)).join('&')
                 : baseUrl;
+            _this.icinga.loader.loadUrl(newUrl, $selector.closest('.container'));
+        }
 
-            // Update the anchor and navigate via IcingaWeb2 loader.
-            _this.lastClickedMetric.set($selector[0], curIndex);
-            _this.icinga.loader.loadUrl(newUrl, $a.closest('.container'));
+        onMetricSelectorClear(event)
+        {
+            event.preventDefault();
+            const $selector = $(event.currentTarget).closest('.perfdatagraphs-metric-selector');
+            $selector.find('a.metric-label-link').removeClass('selected');
         }
     }
     Icinga.Behaviors.Perfdatagraphs = Perfdatagraphs;
