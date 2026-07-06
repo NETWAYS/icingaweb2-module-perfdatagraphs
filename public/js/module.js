@@ -602,7 +602,7 @@
             // if there is a change in deltas.
             let previousDelta = 60; // We start at 60 since 1m is Icinga2's default
             // Since check_interval is not perfect, we expect some jitter
-            const jitter = 5; // I chose 5 arbitrarily
+            let jitter = 6; // 10% of 60
             // Just for convenience
             const isNum = Number.isFinite;
 
@@ -621,6 +621,7 @@
                     }
 
                     previousDelta = currentDelta;
+                    jitter = previousDelta * 0.1;
                 }
             }
 
