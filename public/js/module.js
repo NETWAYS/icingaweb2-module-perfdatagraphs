@@ -108,6 +108,82 @@
         }
 
         /**
+         * parseISODuration parses an ISO-8601 duration string (e.g. P2Y, P4D, PT6H)
+         * and returns the equivalent number of seconds.
+         */
+        parseISODuration(duration)
+        {
+            const regex = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
+            const matches = duration.match(regex);
+
+            if (!matches) {
+                return null;
+            }
+
+            const [, years, months, days, hours, minutes, seconds] = matches;
+
+            return (parseInt(years || 0, 10) * 365.25 * 86400)
+                + (parseInt(months || 0, 10) * 30 * 86400)
+                + (parseInt(days || 0, 10) * 86400)
+                + (parseInt(hours || 0, 10) * 3600)
+                + (parseInt(minutes || 0, 10) * 60)
+                + parseInt(seconds || 0, 10);
+        }
+
+        /**
+         * getRequestedRange reads the perfdatagraphs.duration query parameter
+         * and returns the requested time range in seconds since epoch.
+         * Used so the x-axis always reflects what the user selected, even
+         * when the actual data only covers a fraction of that range (or none
+         * at all, e.g. for a newly created service).
+         */
+        getRequestedRange()
+        {
+            const duration = this.getDurationParam();
+
+            if (!duration) {
+                return null;
+            }
+
+            const durationSeconds = this.parseISODuration(duration);
+
+            if (durationSeconds === null) {
+                return null;
+            }
+
+            const now = Math.floor(Date.now() / 1000);
+
+            return { min: now - durationSeconds, max: now };
+        }
+
+        /**
+         * getDurationParam reads the perfdatagraphs.duration parameter.
+         * Icinga Web dashboards use hash-based routing, where the actual
+         * query string of the currently displayed container lives inside
+         * the hash fragment (e.g. #!/icingadb/service?...&perfdatagraphs.duration=P6M)
+         * rather than in window.location.search. We check both locations.
+         */
+        getDurationParam()
+        {
+            const searchParams = new URLSearchParams(window.location.search);
+            let duration = searchParams.get('perfdatagraphs.duration');
+
+            if (duration) {
+                return duration;
+            }
+
+            const hash = window.location.hash || '';
+            const hashQueryIndex = hash.indexOf('?');
+
+            if (hashQueryIndex !== -1) {
+                const hashParams = new URLSearchParams(hash.substring(hashQueryIndex + 1));
+                duration = hashParams.get('perfdatagraphs.duration');
+            }
+
+            return duration;
+        }
+
+        /**
          * getXProperty returns the properties for the x-axis.
          * Decided to make this a method to have future customization options.
          */
@@ -352,9 +428,18 @@
                 // Add the data to the chart
                 u.setData(d);
 
-                // If a selection is stored we restore it.
+                // If a selection is stored we restore it. Otherwise, if the URL
+                // requested a specific duration (perfdatagraphs.duration), we
+                // force the x-axis to that range so it doesn't get stuck on
+                // just the actual data extent when data is sparse or missing
+                // (e.g. a newly created service).
                 if (this.currentSelect !== null) {
                     u.setScale('x', this.currentSelect);
+                } else {
+                    const requestedRange = this.getRequestedRange();
+                    if (requestedRange !== null) {
+                        u.setScale('x', { min: requestedRange.min, max: requestedRange.max });
+                    }
                 }
                 // If a cursor is stored we restore it.
                 if (this.currentCursor !== null) {
