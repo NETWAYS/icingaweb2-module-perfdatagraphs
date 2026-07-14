@@ -108,79 +108,24 @@
         }
 
         /**
-         * parseISODuration parses an ISO-8601 duration string (e.g. P2Y, P4D, PT6H)
-         * and returns the equivalent number of seconds.
+         * getRequestedMin reads the data-duration attribute (set by the
+         * backend to the resolved "from" timestamp via PHP's DateInterval)
+         * from the given chart element, if present.
+         *
+         * @param HTMLElement elem The chart container element.
+         * @return int|null the "from" timestamp in seconds, or null if absent/invalid.
          */
-        parseISODuration(duration)
+        getRequestedMin(elem)
         {
-            const regex = /^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/;
-            const matches = duration.match(regex);
+            const raw = elem.getAttribute('data-duration');
 
-            if (!matches) {
+            if (raw === null || raw === '') {
                 return null;
             }
 
-            const [, years, months, days, hours, minutes, seconds] = matches;
+            const parsed = parseInt(raw, 10);
 
-            return (parseInt(years || 0, 10) * 365.25 * 86400)
-                + (parseInt(months || 0, 10) * 30 * 86400)
-                + (parseInt(days || 0, 10) * 86400)
-                + (parseInt(hours || 0, 10) * 3600)
-                + (parseInt(minutes || 0, 10) * 60)
-                + parseInt(seconds || 0, 10);
-        }
-
-        /**
-         * getRequestedRange reads the perfdatagraphs.duration query parameter
-         * and returns the requested time range in seconds since epoch.
-         * Used so the x-axis always reflects what the user selected, even
-         * when the actual data only covers a fraction of that range (or none
-         * at all, e.g. for a newly created service).
-         */
-        getRequestedRange()
-        {
-            const duration = this.getDurationParam();
-
-            if (!duration) {
-                return null;
-            }
-
-            const durationSeconds = this.parseISODuration(duration);
-
-            if (durationSeconds === null) {
-                return null;
-            }
-
-            const now = Math.floor(Date.now() / 1000);
-
-            return { min: now - durationSeconds, max: now };
-        }
-
-        /**
-         * getDurationParam reads the perfdatagraphs.duration parameter.
-         * Icinga Web dashboards use hash-based routing, where the actual
-         * query string of the currently displayed container lives inside
-         * the hash fragment (e.g. #!/icingadb/service?...&perfdatagraphs.duration=P6M)
-         * rather than in window.location.search. We check both locations.
-         */
-        getDurationParam()
-        {
-            const searchParams = new URLSearchParams(window.location.search);
-            let duration = searchParams.get('perfdatagraphs.duration');
-
-            if (duration) {
-                return duration;
-            }
-
-            const hash = window.location.hash || '';
-            const hashQueryIndex = hash.indexOf('?');
-
-            if (hashQueryIndex !== -1) {
-                const hashParams = new URLSearchParams(hash.substring(hashQueryIndex + 1));
-                duration = hashParams.get('perfdatagraphs.duration');
-            }
-
-            return duration;
+            return Number.isFinite(parsed) ? parsed : null;
         }
 
         /**
@@ -340,6 +285,69 @@
                 // there are two contains on the page.
                 let opts = {...baseOpts, ...this.getChartSize(elem.offsetWidth)};
 
+                // Override the shared x-scale range resolver with one bound
+                // to *this* chart element's own data-duration attribute
+                // (baseOpts.scales is shared across all charts on the page,
+                // so this must be per-element, not set once globally).
+                const requestedMin = this.getRequestedMin(elem);
+                // Gate on this.currentSelect (already the established signal
+                // elsewhere in this file for "the user has manually zoomed"),
+                // not an apply-once flag: uPlot invokes this resolver more
+                // than once during initial render (once before setData with
+                // no data yet, again after setData with real data) - an
+                // apply-once flag consumes itself on the first call and lets
+                // the second call clobber it back to the actual (narrow)
+                // data extent, which is the bug we hit in manual testing.
+                opts.scales = {
+                    ...baseOpts.scales,
+                    x: {
+                        time: true,
+                        range: (u, dataMin, dataMax) => {
+                            if (requestedMin !== null && this.currentSelect === null) {
+                                return [requestedMin, Math.floor(Date.now() / 1000)];
+                            }
+                            return [dataMin, dataMax];
+                        }
+                    }
+                };
+
+                // The shared ondblclick handler (in getChartBaseOptions())
+                // only updates currentSelect bookkeeping for the *next*
+                // full render. That leaves a visible gap where the chart
+                // briefly jumps to uPlot's own native reset (the full
+                // actual data extent) until the next autorefresh applies
+                // our override again. Override it per-instance here so the
+                // requested range is re-applied immediately, synchronously,
+                // in the same double-click handler.
+                //
+                // Importantly, this must apply to ALL charts on the page
+                // (there can be several, e.g. mem_active/mem_anonpages/
+                // mem_available on one service), not just the one that was
+                // actually double-clicked - otherwise the other charts stay
+                // in whatever zoom state they were in until the next
+                // autorefresh. We iterate this.plots (already tracked for
+                // the resize observer) and look up each chart's own
+                // data-duration individually, since the closure-local
+                // requestedMin here only applies to *this* chart element.
+                opts.hooks = {
+                    ...baseOpts.hooks,
+                    init: [
+                        ...baseOpts.hooks.init,
+                        u => {
+                            u.over.ondblclick = e => {
+                                this.currentSelect = null;
+                                const now = Math.floor(Date.now() / 1000);
+                                this.plots.forEach((plotInstance, plotElem) => {
+                                    const plotRequestedMin = this.getRequestedMin(plotElem);
+                                    if (plotRequestedMin !== null) {
+                                        plotInstance.setScale('x', { min: plotRequestedMin, max: now });
+                                    }
+                                });
+                            };
+                        }
+                    ]
+                };
+
                 // Add each element to the resize observer so that we can
                 // resize the chart when its container changes
                 this.resizeObserver.observe(elem);
@@ -432,18 +440,11 @@
                 // Add the data to the chart
                 u.setData(d);
 
-                // If a selection is stored we restore it. Otherwise, if the URL
-                // requested a specific duration (perfdatagraphs.duration), we
-                // force the x-axis to that range so it doesn't get stuck on
-                // just the actual data extent when data is sparse or missing
-                // (e.g. a newly created service).
+                // If a selection is stored we restore it. The default/requested
+                // range (when there's no stored selection) is now handled by
+                // the x.range callback set above.
                 if (this.currentSelect !== null) {
                     u.setScale('x', this.currentSelect);
-                } else {
-                    const requestedRange = this.getRequestedRange();
-                    if (requestedRange !== null) {
-                        u.setScale('x', { min: requestedRange.min, max: requestedRange.max });
-                    }
                 }
                 // If a cursor is stored we restore it.
                 if (this.currentCursor !== null) {
