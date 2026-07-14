@@ -275,9 +275,13 @@
                     init: [
                         u => {
                             u.over.ondblclick = e => {
-                                // We need to reset the currentSelect to the min/max
-                                // when we zoom out again.
-                                this.currentSelect = {min: 0, max: 0};
+                                // We need to reset the currentSelect so that
+                                // the axis falls back to the requested/default
+                                // range on the next render, instead of forcing
+                                // it to a literal {min: 0, max: 0} (epoch).
+                                // null is the same reset sentinel used elsewhere
+                                // (see the non-autorefresh reset in rendered()).
+                                this.currentSelect = null;
                             }
                         }
                     ],
