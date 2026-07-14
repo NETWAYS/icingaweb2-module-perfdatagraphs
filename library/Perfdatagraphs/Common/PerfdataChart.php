@@ -16,6 +16,10 @@ use ipl\Html\ValidHtml;
 use ipl\I18n\Translation;
 use ipl\Web\Url;
 
+use DateTime;
+use DateInterval;
+use DateMalformedIntervalStringException;
+
 /**
  * PerfdataChart contains common functionality used for rendering the performance data charts.
  * The idea is that you use this to create the chart elements.
@@ -37,6 +41,27 @@ trait PerfdataChart
         // We use a faster non-cryptographic hash, since we don't do crypto here, we just need stable names here.
         // In the future we should switch to an xxHash algorithm, I wanted to keep PHP8.0 compatibility for now.
         return hash('md5', sprintf('%s-%s-%s', $hostName, $serviceName, $checkCommandName));
+    }
+
+    /**
+     * parseDuration resolves an ISO-8601 duration string to the Unix
+     * timestamp it represents ("now" minus the interval), using PHP's
+     * built-in DateInterval instead of reimplementing ISO-8601 parsing.
+     * Falls back to PT12H for an unparseable duration string.
+     *
+     * @param string $duration An interval specification.
+     * @return int the resulting timestamp in seconds.
+     */
+    private static function parseDuration(string $duration): int
+    {
+        $now = new DateTime();
+        try {
+            $int = new DateInterval($duration);
+        } catch (DateMalformedIntervalStringException $e) {
+            $int = new DateInterval('PT12H');
+        }
+        $now->sub($int);
+        return $now->getTimestamp();
     }
 
     /**
@@ -137,6 +162,7 @@ trait PerfdataChart
                 // We use a perfdatagraphs prefix here to avoid overlap with other modules (i.e. Icinga Kubernetes)
                 'class' => 'perfdatagraphs-line-chart',
                 'id' => $elemID . '_' . $title,
+                'data-duration' => $this->parseDuration($duration),
                 'data-perfdata' => $data,
             ]);
             $charts->add($chart);
