@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.0
+
+- Raise minimum requirements to PHP 8.2
+- Fix x-axis not adjusting when no data is available for the selected range
+
 ## v0.4.2
 
 - Fix FileCache filename encoding may contain slashes
