@@ -307,7 +307,7 @@
                 elem.replaceChildren();
 
                 // Create a new uplot chart for each performance dataset
-                dataset.timestamps = this.ensureArray(dataset.timestamps);
+
                 // Base format function for the y-axis
                 let formatYFunction = (u, vals, space) => vals.map(v => this.formatNumber(v));
                 // Override the default uplot callback so that smaller values are
@@ -349,8 +349,7 @@
                 // Using a 'classic' for loop since we need the index
                 for (let idx = 0; idx < dataset.series.length; idx++) {
                     // // The series we are going to add (e.g. values, warn, crit, etc.)
-                    let set = dataset.series[idx].values;
-                    set = this.ensureArray(set);
+                    const set = dataset.series[idx].values;
 
                     // We show all series by default unless warn/crit have show_thresholds to false
                     const defaultShow = dataset.series[idx].name === CHART_WARN_SERIESNAME || dataset.series[idx].name === CHART_CRIT_SERIESNAME
@@ -448,20 +447,6 @@
             }
 
             return tplNew;
-        }
-
-        /**
-         * ensureArray ensures the given object is an Array.
-         * It will transform Objects if possible.
-         * A dirty PHP 8.0 hack since I sometimes used SplFixedArray.
-         * Can be removed once PHP 8.0 is ancient history.
-         */
-        ensureArray(obj) {
-            if (typeof obj === 'object' && !Array.isArray(obj)) {
-                return Object.values(obj);
-            }
-
-            return obj;
         }
 
         /**
