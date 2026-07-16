@@ -108,6 +108,28 @@
         }
 
         /**
+         * getRequestedRange reads the data-duration attribute
+         * from the given chart element, if present.
+         * The backend sets this value based on the requested duration.
+         * Returns the [min, max] range for the plot.
+         */
+        getRequestedRange(elem)
+        {
+            const duration = elem.getAttribute('data-duration');
+
+            const max = Math.floor(Date.now() / 1000);
+
+            if (duration === null || duration === '') {
+                return [null, max];
+            }
+
+            const parsedDuration = parseInt(duration, 10);
+            const min = Number.isFinite(parsedDuration) ? parsedDuration : null;
+
+            return [min, max];
+        }
+
+        /**
          * getXProperty returns the properties for the x-axis.
          * Decided to make this a method to have future customization options.
          */
@@ -159,7 +181,7 @@
          * getChartOptions returns shared base options for all charts.
          * These will get merged with individual options (e.g. axes config).
          */
-        getChartBaseOptions()
+        getChartBaseOptions(elem)
         {
             // Options for formatting datetime
             const timezone = this.icinga.config.timezone;
@@ -175,7 +197,16 @@
                     return uPlot.fmtDate(tplNew)
                 },
                 scales: {
-                    x: { time: true },
+                    x: {
+                        time: true,
+                        range: (u, min, max) => {
+                            const range = this.getRequestedRange(elem);
+                            if (range[0] !== null && this.currentSelect === null) {
+                                return range;
+                            }
+                            return [min, max];
+                        }
+                    },
                     y: { range: {
                             min: {
                                 soft: 0,
@@ -199,9 +230,13 @@
                     init: [
                         u => {
                             u.over.ondblclick = e => {
-                                // We need to reset the currentSelect to the min/max
-                                // when we zoom out again.
+                                // We need to reset the currentSelect to the min/max to zoom out
                                 this.currentSelect = {min: 0, max: 0};
+                                const range = this.getRequestedRange(elem);
+                                if (range[0] !== null) {
+                                    const plot = this.plots.get(elem);
+                                    plot.setScale('x', { min: range[0], max: range[1] });
+                                }
                             }
                         }
                     ],
@@ -247,7 +282,6 @@
             const criticalColor = $('div.critical-color').css('background-color');
             const valueColor = $('div.value-color').css('background-color');
             // These are the shared options for all charts
-            const baseOpts = this.getChartBaseOptions();
 
             this.icinga.logger.debug('perfdatagraphs', 'start renderCharts');
 
@@ -258,6 +292,7 @@
 
                 // The size can vary from chart to chart for example when
                 // there are two contains on the page.
+                const baseOpts = this.getChartBaseOptions(elem);
                 let opts = {...baseOpts, ...this.getChartSize(elem.offsetWidth)};
 
                 // Add each element to the resize observer so that we can
