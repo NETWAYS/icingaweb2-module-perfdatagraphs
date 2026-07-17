@@ -61,7 +61,7 @@
          */
         rendered(event, isAutorefresh)
         {
-            let _this = event.data.self;
+            const _this = event.data.self;
 
             if (!isAutorefresh) {
                 _this.icinga.logger.debug('perfdatagraphs', 'not an autorefresh. resetting');
@@ -288,7 +288,14 @@
             for (let elem of lineCharts) {
                 this.icinga.logger.debug('perfdatagraphs', 'rendering for', elem);
 
-                const dataset = JSON.parse(elem.getAttribute('data-perfdata'));
+                let dataset;
+
+                try {
+                    dataset = JSON.parse(elem.getAttribute('data-perfdata'));
+                } catch (e) {
+                    this.icinga.logger.error('perfdatagraphs', 'Failed to parse perfdata', elem, e);
+                    continue;
+                }
 
                 // The size can vary from chart to chart for example when
                 // there are two contains on the page.
