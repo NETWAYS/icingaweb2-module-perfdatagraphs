@@ -27,6 +27,7 @@ class PerfdataSet implements JsonSerializable
 
     /** @var iterable The timestamps for this dataset */
     protected iterable $timestamps = [];
+    // TODO: iterable might be too broad, we want to be able to use array and SplFixedArray
 
     /** @var array Associative array of PerfdataSeries for this dataset with their name as key */
     protected array $series = [];

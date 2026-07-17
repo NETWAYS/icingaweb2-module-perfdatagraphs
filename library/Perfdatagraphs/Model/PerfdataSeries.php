@@ -13,7 +13,8 @@ class PerfdataSeries implements JsonSerializable
     protected string $name;
 
      /** @var iterable The values for this series */
-    protected iterable $values = [];
+    protected iterable $values;
+    // TODO: iterable might be too broad, we want to be able to use array and SplFixedArray
 
     /**
      * @param string $name
@@ -85,17 +86,10 @@ class PerfdataSeries implements JsonSerializable
      */
     public function jsonSerialize(): mixed
     {
-        $d = [];
-
-        if (isset($this->name)) {
-            $d['name'] = $this->name;
-        }
-
-        if (isset($this->values)) {
-            $d['values'] = $this->values;
-        }
-
-        return $d;
+        return [
+            'name' => $this->name,
+            'values' => $this->values,
+        ];
     }
 
     /**
@@ -126,7 +120,7 @@ class PerfdataSeries implements JsonSerializable
      */
     public function isValid(): bool
     {
-        if (empty($this->name)) {
+        if ($this->name === '') {
             return false;
         }
 

@@ -144,9 +144,7 @@ class PerfdataResponse implements JsonSerializable
      */
     public function removeDataset(string $title): void
     {
-        if (array_key_exists($title, $this->data)) {
-            unset($this->data[$title]);
-        }
+        unset($this->data[$title]);
     }
 
     /**
