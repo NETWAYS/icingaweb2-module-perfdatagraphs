@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.2', '8.3']
+        php: ['8.5']
         os: ['ubuntu-24.04']
 
     steps:
@@ -32,7 +32,7 @@ jobs:
           tools: phpcs
 
       - name: Setup dependencies
-        run: composer require -n --no-progress overtrue/phplint
+        run: composer install
 
       - name: PHP Lint
         if: success() || matrix.allow_failure

@@ -1,0 +1,15 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^13.2",
+        "overtrue/phplint": "^9.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Icinga\\Module\\Perfdatagraphs\\": "library/Perfdatagraphs/",
+            "ipl\\I18n\\": "_libraries/ipl/vendor/ipl/i18n/src/",
+            "ipl\\Stdlib\\": "_libraries/ipl/vendor/ipl/stdlib/src/",
+            "ipl\\": "_libraries/ipl/vendor/ipl/",
+            "Icinga\\": "_icingaweb2/library/Icinga/"
+        }
+    }
+}
