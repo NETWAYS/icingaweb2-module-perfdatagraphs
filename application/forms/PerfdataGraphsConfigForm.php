@@ -11,6 +11,8 @@ use Zend_Validate_Callback;
 
 /**
  * PerfdataGraphsConfigForm represents the configuration form for the PerfdataGraphs Module.
+ * TODO: Icinga Web 2.14 introduced a new Web\Form\ConfigForm, we can migrate when 2.14 is more prevalent
+ * Then we can also use ipl Validators.
  */
 class PerfdataGraphsConfigForm extends ConfigForm
 {
