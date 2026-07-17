@@ -25,7 +25,9 @@ Configuration options are limited by design.
   * Mouse click and select a region to zoom in
   * Click on a time range or double click to zoom out
 * Graphs are adjustable via Icinga 2 custom variables
-* Interchangeable performance data backends
+* Adjustable time range buttons via configuration
+* A Tab view that can be included in dashboards
+* Changeable backends for performance data
   * Fetched data is cached to improve speed and reduce load on the backend
 
 ## Installation Requirements
@@ -36,14 +38,3 @@ Configuration options are limited by design.
 ## Documentation
 
 Documentation for this module is available at [doc](doc/).
-
-## Known Issues
-
-# Road to Version 1.0.0
-
-What our current idea for a version 1.0.0 of this module is:
-
-* It should work with every Icinga performance data writer with minimal configuration by the user
-* It should be a robust solution for all check plugins
-* It should integrate seamlessly in the Icinga Web UI
-* It should provide enough options for customization for most use cases
