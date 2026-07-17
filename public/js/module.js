@@ -236,8 +236,9 @@
                                 this.currentSelect = {min: 0, max: 0};
                                 const range = this.getRequestedRange(elem);
                                 if (range[0] !== null) {
-                                    const plot = this.plots.get(elem);
-                                    plot.setScale('x', { min: range[0], max: range[1] });
+                                    this.plots.forEach(plot => {
+                                        plot.setScale('x', { min: range[0], max: range[1] });
+                                    });
                                 }
                             }
                         }
