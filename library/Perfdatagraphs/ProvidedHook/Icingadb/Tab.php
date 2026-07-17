@@ -149,6 +149,9 @@ class Tab extends TabHook
             new Attributes(['class' => 'collapsible', 'data-visible-height' => 65, 'label' => 'Collapse']),
         );
 
+        // Button to remove all selected labels
+        $labelList->addLink($this->translate('Remove selection'), Url::fromRequest()->without('perfdatagraphs.label'), []);
+
         foreach ($sets as $set) {
             $t = $set->getTitle();
             $isActive = in_array($t, $labels);
