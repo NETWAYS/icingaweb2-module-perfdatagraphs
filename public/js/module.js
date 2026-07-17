@@ -562,6 +562,9 @@
             } else if (Math.abs(n) < 31536000) {
                 value = n / 604800;
                 return `${value.toFixed(2)} weeks`;
+            } else {
+                value = n / 31536000;
+                return `${value.toFixed(2)} years`;
             }
         }
 
