@@ -76,6 +76,8 @@
 
             // Remove leftover eventhandlers and uPlot instances
             _this.plots.forEach((plot, element) => {
+                _this.resizeObserver.unobserve(element);
+                _this.intersectionObserver.unobserve(element);
                 plot.destroy();
             });
             // Then, reset the existing plots map for the new rendering
@@ -484,7 +486,7 @@
          */
         formatNumber(n, suffix)
         {
-            if (n == 0) {
+            if (n === 0) {
                 return 0;
             }
 
