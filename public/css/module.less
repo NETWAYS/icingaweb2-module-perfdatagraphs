@@ -21,6 +21,11 @@ always collapsed and we use the min-height to show a single chart.
     content-visibility: auto;
 }
 
+.tag-list li a.active {
+    background-color: @icinga-blue;
+    color: @white;
+}
+
 /*
 These elements are used to retrive colors in the JavaScript part of the module
 */
@@ -91,5 +96,42 @@ ul.quick-actions {
         margin: 0 .25em .5em .25em;
         vertical-align: middle;
         white-space: nowrap;
+    }
+}
+
+/* Since we want this to work in the Monitoring module as well, for now */
+.tag-list {
+    line-height: 1.5;
+    list-style-type: none;
+    margin: -.25em 0 0 0;
+    padding: 0;
+
+    > li:first-of-type > a {
+        border: none;
+        background-color: transparent;
+    }
+    > li {
+        display: inline-block;
+
+        &:not(:last-child) {
+            margin-right: .417em;
+            margin-bottom: .25em;
+        }
+
+        i {
+            opacity: 0.8;
+        }
+    }
+
+    > li > a {
+        .rounded-corners();
+        background-color: @gray-lighter;
+        display: block;
+        padding: .25em .5em;
+
+        &:hover {
+            background-color: @gray-light;
+            text-decoration: none;
+        }
     }
 }

@@ -7,17 +7,22 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Widget\TagList;
 
 use Icinga\Module\Icingadb\Hook\TabHook;
 use Icinga\Module\Icingadb\Model\Host;
 use Icinga\Module\Icingadb\Model\Service;
 
 use Icinga\Application\Icinga;
+use Icinga\Data\Filter\Filter;
 
+use ipl\Html\Attributes;
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\HtmlString;
 use ipl\Orm\Model;
+use ipl\Web\Url;
+use ipl\Web\Widget\ActionLink;
 
 class Tab extends TabHook
 {
@@ -59,6 +64,7 @@ class Tab extends TabHook
         }
 
         $request = Icinga::app()->getRequest();
+        $view = Icinga::app()->getViewRenderer()->view;
 
         $config = ModuleConfig::getConfigWithDefaults();
         $defaultDuration = $config['default_timerange'];
@@ -93,7 +99,7 @@ class Tab extends TabHook
         }
 
         $source = new PerfdataSource($config, $hook);
-        $request = new PerfdataRequest(
+        $perfRequest = new PerfdataRequest(
             hostName: $hostName,
             serviceName: $serviceName,
             checkCommand: $checkCommandName,
@@ -106,7 +112,7 @@ class Tab extends TabHook
 
         $customVarsMetrics = $cvh->getPerfdataGraphsMetricsForObject($object);
 
-        $response = $source->fetch($request, $customVarsMetrics);
+        $response = $source->fetch($perfRequest, $customVarsMetrics);
 
         // Ensure labels have a predictable order
         $sets = $response->getDatasets();
@@ -116,8 +122,16 @@ class Tab extends TabHook
 
         $response->setDatasets($sets);
 
+        $sets = $response->getDatasets();
+        $collapsible = $this->createTagList($sets, $labels);
+
+        // We hide the label list in the compact view, e.g. Dashboards
+        if (!$view->compact) {
+            $content[] = $collapsible;
+        }
+
         $limit = -1;
-        $chart = $this->createChart(request: $request, response: $response, filter: $labels, limit: $limit);
+        $chart = $this->createChart(request: $perfRequest, response: $response, filter: $labels, limit: $limit);
         $content[] = HtmlString::create($chart);
 
         if (empty($chart)) {
@@ -126,5 +140,52 @@ class Tab extends TabHook
         }
 
         return $content;
+    }
+
+    private function createTagList($sets, $labels): HtmlElement
+    {
+        $labelList = new TagList();
+        $collapsible = new HtmlElement(
+            'div',
+            new Attributes(['class' => 'collapsible', 'data-visible-height' => 65, 'label' => 'Collapse']),
+        );
+
+        // Button to remove all selected labels
+        $labelList->addLink(
+            $this->translate('Deselect All'),
+            Url::fromRequest()->without('perfdatagraphs.label'),
+            [
+                'title' => $this->translate('Deselect all selected metrics'),
+                'class' => 'action-link'
+            ]
+        );
+
+        foreach ($sets as $set) {
+            $t = $set->getTitle();
+            $isActive = in_array($t, $labels);
+            $attrs = $isActive ? ['class' => 'active'] : ['class' => 'inactive'];
+            $attrs['title'] = sprintf('Toggle the %s metric', $t);
+            // Build new label list supporting multiple identical query keys
+            if ($isActive) {
+                // Remove current label
+                $newLabels = array_filter($labels, fn($v) => $v !== $t);
+                $newLabels = array_values($newLabels);
+            } else {
+                // Add current label
+                $newLabels = $labels;
+                $newLabels[] = $t;
+            }
+
+            // Start from the current request but remove any existing label parameters
+            $url = Url::fromRequest()->without('perfdatagraphs.label');
+            foreach ($newLabels as $lbl) {
+                // add each active label to the url
+                $url->addFilter(Filter::where('perfdatagraphs.label', $lbl));
+            }
+            $labelList->addLink($t, $url, $attrs);
+        }
+        $collapsible->add($labelList);
+
+        return $collapsible;
     }
 }

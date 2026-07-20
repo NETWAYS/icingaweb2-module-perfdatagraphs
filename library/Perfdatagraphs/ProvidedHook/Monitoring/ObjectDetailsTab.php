@@ -7,17 +7,22 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Ido\IcingaObjectHelper as IdoCVH;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Widget\TagList;
 
 use Icinga\Module\Monitoring\Hook\ObjectDetailsTabHook;
 use Icinga\Module\Monitoring\Object\Host;
 use Icinga\Module\Monitoring\Object\MonitoredObject;
 use Icinga\Module\Monitoring\Object\Service;
 
+use Icinga\Application\Icinga;
 use Icinga\Web\Request;
 
+use ipl\Html\Attributes;
 use ipl\Html\Html;
 use ipl\Html\HtmlElement;
 use ipl\Html\HtmlString;
+use ipl\Stdlib\Filter;
+use ipl\Web\Url;
 
 class ObjectDetailsTab extends ObjectDetailsTabHook
 {
@@ -69,6 +74,7 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
 
         $cvh = new IdoCVH();
 
+        $view = Icinga::app()->getViewRenderer()->view;
         $customvars = $cvh->getPerfdataGraphsConfigForObject($object);
 
         // If the object wants the data from a custom backend
@@ -110,6 +116,14 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
             return strnatcmp($a->getTitle(), $b->getTitle());
         });
 
+        $collapsible = $this->createTagList($sets, $labels);
+
+        $content = [];
+
+        // We hide the label list in the compact view, e.g. Dashboards
+        if (!$view->compact) {
+            $content[] = $collapsible;
+        }
         $response->setDatasets($sets);
 
         $limit = -1;
@@ -118,7 +132,47 @@ class ObjectDetailsTab extends ObjectDetailsTabHook
         if (empty($chart)) {
             return $this->addError($this->translate('Chart could not be rendered'));
         }
+        $content[] = $chart;
 
-        return Html::tag('div', ['class' => 'icinga-module module-perfdatagraphs'], HtmlString::create($chart));
+        return Html::tag('div', ['class' => 'icinga-module module-perfdatagraphs'], $content);
+    }
+
+    private function createTagList($sets, $labels): HtmlElement
+    {
+        $labelList = new TagList();
+        $collapsible = new HtmlElement(
+            'div',
+            new Attributes(['class' => 'collapsible', 'data-visible-height' => 65, 'label' => 'Collapse']),
+        );
+
+        // Button to remove all selected labels
+        $labelList->addLink($this->translate('Remove selection'), Url::fromRequest()->without('perfdatagraphs.label'), ['title' => $this->translate('Deselect all selected metrics')]);
+
+        foreach ($sets as $set) {
+            $t = $set->getTitle();
+            $isActive = in_array($t, $labels);
+            $attrs = $isActive ? ['class' => 'active'] : ['class' => 'inactive'];
+            $attrs['title'] = sprintf('Toggle the %s metric', $t);
+            // Build new label list supporting multiple identical query keys
+            if ($isActive) {
+                // Remove current label
+                $newLabels = array_filter($labels, fn($v) => $v !== $t);
+                $newLabels = array_values($newLabels);
+            } else {
+                // Add current label
+                $newLabels = $labels;
+                $newLabels[] = $t;
+            }
+            // Start from the current request but remove any existing label parameters
+            $url = Url::fromRequest()->without('perfdatagraphs.label');
+            foreach ($newLabels as $lbl) {
+                // add each active label to the url
+                $url->addFilter(\Icinga\Data\Filter\Filter::where('perfdatagraphs.label', $lbl));
+            }
+            $labelList->addLink($t, $url, $attrs);
+        }
+        $collapsible->add($labelList);
+
+        return $collapsible;
     }
 }
