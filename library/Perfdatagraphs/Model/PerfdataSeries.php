@@ -3,6 +3,7 @@
 namespace Icinga\Module\Perfdatagraphs\Model;
 
 use JsonSerializable;
+use SplFixedArray;
 
 /**
  * PerfdataSeries represents a single series (y-axis) on the chart.
@@ -12,15 +13,14 @@ class PerfdataSeries implements JsonSerializable
      /** @var string The name for this series */
     protected string $name;
 
-     /** @var iterable The values for this series */
-    protected iterable $values;
-    // TODO: iterable might be too broad, we want to be able to use array and SplFixedArray
+     /** @var array|\SplFixedArray The values for this series */
+    protected array|\SplFixedArray $values;
 
     /**
      * @param string $name
-     * @param iterable $values
+     * @param array|\SplFixedArray $values
      */
-    public function __construct(string $name, iterable $values = [])
+    public function __construct(string $name, array|\SplFixedArray $values = [])
     {
         $this->name = $name;
         $this->values = $values;
@@ -50,9 +50,9 @@ class PerfdataSeries implements JsonSerializable
     /**
      * getValues returns the values for the series
      *
-     * @return iterable
+     * @return array|\SplFixedArray
      */
-    public function getValues(): iterable
+    public function getValues(): array|\SplFixedArray
     {
         return $this->values;
     }
@@ -71,10 +71,10 @@ class PerfdataSeries implements JsonSerializable
     /**
      * setValues sets the values for the series
      *
-     * @param iterable $values
+     * @param array|\SplFixedArray $values
      * @return void
      */
-    public function setValues(iterable $values): void
+    public function setValues(array|\SplFixedArray $values): void
     {
         $this->values = $values;
     }

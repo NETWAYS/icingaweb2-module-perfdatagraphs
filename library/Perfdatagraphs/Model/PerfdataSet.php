@@ -25,9 +25,8 @@ class PerfdataSet implements JsonSerializable
      /** @var string Display this dataset's thresholds or not */
     protected bool $showThresholds = true;
 
-    /** @var iterable The timestamps for this dataset */
-    protected iterable $timestamps = [];
-    // TODO: iterable might be too broad, we want to be able to use array and SplFixedArray
+    /** @var array|\SplFixedArray The timestamps for this dataset */
+    protected array|\SplFixedArray $timestamps = [];
 
     /** @var array Associative array of PerfdataSeries for this dataset with their name as key */
     protected array $series = [];
@@ -285,9 +284,9 @@ class PerfdataSet implements JsonSerializable
     /**
      * getTimestamps gets the timestamps of this dataset.
      *
-     * @return iterable the timestamps of this dataset
+     * @return array|\SplFixedArray the timestamps of this dataset
      */
-    public function getTimestamps(): iterable
+    public function getTimestamps(): array|\SplFixedArray
     {
         return $this->timestamps;
     }
@@ -295,10 +294,10 @@ class PerfdataSet implements JsonSerializable
     /**
      * setTimestamps sets the timestamps for this dataset.
      *
-     * @param iterable $ts
+     * @param array|\SplFixedArray $ts
      * @return void
      */
-    public function setTimestamps(iterable $ts): void
+    public function setTimestamps(array|\SplFixedArray $ts): void
     {
         $this->timestamps = $ts;
     }
