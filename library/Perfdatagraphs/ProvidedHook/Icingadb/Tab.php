@@ -22,6 +22,7 @@ use ipl\Html\HtmlElement;
 use ipl\Html\HtmlString;
 use ipl\Orm\Model;
 use ipl\Web\Url;
+use ipl\Web\Widget\ActionLink;
 
 class Tab extends TabHook
 {
@@ -150,7 +151,14 @@ class Tab extends TabHook
         );
 
         // Button to remove all selected labels
-        $labelList->addLink($this->translate('Remove selection'), Url::fromRequest()->without('perfdatagraphs.label'), ['title' => $this->translate('Deselect all selected metrics')]);
+        $labelList->addLink(
+            $this->translate('Deselect All'),
+            Url::fromRequest()->without('perfdatagraphs.label'),
+            [
+                'title' => $this->translate('Deselect all selected metrics'),
+                'class' => 'action-link'
+            ]
+        );
 
         foreach ($sets as $set) {
             $t = $set->getTitle();
