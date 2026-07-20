@@ -150,13 +150,13 @@ class Tab extends TabHook
         );
 
         // Button to remove all selected labels
-        $labelList->addLink($this->translate('Remove selection'), Url::fromRequest()->without('perfdatagraphs.label'), []);
+        $labelList->addLink($this->translate('Remove selection'), Url::fromRequest()->without('perfdatagraphs.label'), ['title' => $this->translate('Deselect all selected metrics')]);
 
         foreach ($sets as $set) {
             $t = $set->getTitle();
             $isActive = in_array($t, $labels);
             $attrs = $isActive ? ['class' => 'active'] : ['class' => 'inactive'];
-            $attrs['title'] = sprintf('toggle the %s metric', $t);
+            $attrs['title'] = sprintf('Toggle the %s metric', $t);
             // Build new label list supporting multiple identical query keys
             if ($isActive) {
                 // Remove current label
