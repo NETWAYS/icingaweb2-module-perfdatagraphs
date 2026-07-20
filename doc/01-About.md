@@ -22,6 +22,7 @@ flowchart TD
 * Graphs are adjustable via Icinga 2 custom variables
 * Interchangeable performance data backends
   * Fetched data is cached to improve speed and reduce load on the backend
+* Provides Hooks to modify the data
 
 ## Design Decisions
 

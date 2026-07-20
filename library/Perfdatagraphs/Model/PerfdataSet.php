@@ -247,6 +247,20 @@ class PerfdataSet implements JsonSerializable
     }
 
     /**
+     * getSeriesByName gets the requested series of this dataset.
+     *
+     * @return PerfdataSeries The series of this dataset
+     */
+    public function getSeriesByName(string $name): ?PerfdataSeries
+    {
+        if (array_key_exists($name, $this->series)) {
+            return $this->series[$name];
+        }
+
+        return null;
+    }
+
+    /**
      * setSeries overrides the series of this dataset.
      *
      * @param array $series the series for this dataset
@@ -276,9 +290,7 @@ class PerfdataSet implements JsonSerializable
      */
     public function removeSeries(string $name): void
     {
-        if (array_key_exists($name, $this->series)) {
-            unset($this->series[$name]);
-        }
+        unset($this->series[$name]);
     }
 
     /**

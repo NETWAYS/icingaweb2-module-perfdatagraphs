@@ -6,6 +6,7 @@ use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataResponse;
 
 use Icinga\Application\Benchmark;
+use Icinga\Application\Hook;
 use Icinga\Application\Logger;
 
 use Exception;
@@ -119,6 +120,14 @@ class PerfdataSource
             // because of simpler testability.
             $response->mergeCustomVars($customVarsMetrics);
             $this->storeDataToCache($cacheKey, $response);
+        }
+
+        foreach (Hook::all('perfdatagraphs/PerfdataPrerender') as $prerender) {
+            try {
+                $response = $prerender->transform($response);
+            } catch (Throwable $e) {
+                Logger::error("Failed to call Perfdatagraphs Prerender Hook: %s", $e);
+            }
         }
 
         return $response;
