@@ -7,6 +7,7 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Widget\ShowMore;
 
 use Icinga\Module\Icingadb\Hook\HostDetailExtensionHook;
 use Icinga\Module\Icingadb\Model\Host;
@@ -119,6 +120,11 @@ class HostDetailExtension extends HostDetailExtensionHook
         $d = Html::tag('div');
         $d->add($header);
         $d->add($chart);
+        $d->add((new ShowMore(
+            Url::fromPath('icingadb/host/graphs', ['name' => $hostName]),
+            $this->translate('Show more'),
+            ['title' => $this->translate('Show all performance data graphs')]
+        )));
 
         return $d;
     }

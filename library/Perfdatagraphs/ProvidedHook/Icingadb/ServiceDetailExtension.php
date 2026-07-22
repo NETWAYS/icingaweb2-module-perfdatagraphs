@@ -7,6 +7,7 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Icingadb\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Widget\ShowMore;
 
 use Icinga\Module\Icingadb\Hook\ServiceDetailExtensionHook;
 use Icinga\Module\Icingadb\Model\Service;
@@ -119,6 +120,11 @@ class ServiceDetailExtension extends ServiceDetailExtensionHook
         $d = Html::tag('div');
         $d->add($header);
         $d->add($chart);
+        $d->add((new ShowMore(
+            Url::fromPath('icingadb/service/graphs', ['host.name' => $hostName, 'name' => $serviceName]),
+            $this->translate('Show more'),
+            ['title' => $this->translate('Show all performance data graphs')]
+        )));
 
         return $d;
     }

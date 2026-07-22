@@ -7,6 +7,7 @@ use Icinga\Module\Perfdatagraphs\Common\PerfdataChart;
 use Icinga\Module\Perfdatagraphs\Common\PerfdataSource;
 use Icinga\Module\Perfdatagraphs\Ido\IcingaObjectHelper;
 use Icinga\Module\Perfdatagraphs\Model\PerfdataRequest;
+use Icinga\Module\Perfdatagraphs\Widget\ShowMore;
 
 use Icinga\Module\Monitoring\Hook\DetailviewExtensionHook;
 use Icinga\Module\Monitoring\Object\Host;
@@ -119,7 +120,7 @@ class DetailviewExtension extends DetailviewExtensionHook
             return $err;
         }
 
-        $isHostCheck = $isHostCheck === true ? 'true' : 'false';
+        // $isHostCheck = $isHostCheck === true ? 'true' : 'false';
 
         $headline = $this->translate('Performance Data Graph');
         $header = Html::tag('h2', $headline);
@@ -127,6 +128,14 @@ class DetailviewExtension extends DetailviewExtensionHook
         $d = Html::tag('div');
         $d->add($header);
         $d->add($chart);
+
+        $p = $isHostCheck ? 'monitoring/host/tabhook' : 'monitoring/service/tabhook';
+
+        $d->add((new ShowMore(
+            Url::fromPath($p, ['host' => $hostName, 'service' => $serviceName, 'hook' => 'graphs']),
+            $this->translate('Show more'),
+            ['title' => $this->translate('Show all performance data graphs')]
+        )));
 
         return $d;
     }
