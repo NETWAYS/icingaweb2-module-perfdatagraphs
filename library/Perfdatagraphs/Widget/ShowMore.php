@@ -3,14 +3,11 @@
 namespace Icinga\Module\Perfdatagraphs\Widget;
 
 use ipl\Html\BaseHtmlElement;
-use ipl\Web\Common\BaseTarget;
 use ipl\Web\Url;
 use ipl\Web\Widget\ActionLink;
 
 class ShowMore extends BaseHtmlElement
 {
-    use BaseTarget;
-
     protected $defaultAttributes = ['class' => 'show-more'];
     protected $tag = 'div';
     protected Url $url;
