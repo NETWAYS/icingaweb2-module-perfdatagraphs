@@ -120,8 +120,6 @@ class DetailviewExtension extends DetailviewExtensionHook
             return $err;
         }
 
-        // $isHostCheck = $isHostCheck === true ? 'true' : 'false';
-
         $headline = $this->translate('Performance Data Graph');
         $header = Html::tag('h2', $headline);
 
