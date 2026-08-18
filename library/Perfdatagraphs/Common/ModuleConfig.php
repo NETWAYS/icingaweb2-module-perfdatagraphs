@@ -87,6 +87,7 @@ class ModuleConfig
             'cache_lifetime' => 900,
             'default_timerange' => 'PT12H',
             'minimum_chart_count' => 3,
+            'disable_thresholds_rendering' => false,
         ];
 
         // Try to load the configuration
@@ -104,6 +105,7 @@ class ModuleConfig
         $config['cache_lifetime'] = (int) $moduleConfig->get('perfdatagraphs', 'cache_lifetime', $default['cache_lifetime']);
         $config['minimum_chart_count'] = (int) $moduleConfig->get('perfdatagraphs', 'minimum_chart_count', $default['minimum_chart_count']);
         $config['default_timerange'] = $moduleConfig->get('perfdatagraphs', 'default_timerange', $default['default_timerange']);
+        $config['disable_thresholds_rendering'] = (bool) $moduleConfig->get('perfdatagraphs', 'disable_thresholds_rendering', $default['disable_thresholds_rendering']);
 
         return $config;
     }

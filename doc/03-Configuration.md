@@ -15,6 +15,10 @@ default_backend = "Graphite"
 
 # How long the data for the charts will be cached by the server.
 cache_lifetime = 9000
+
+# Disable rendering of all warning and critical thresholds by default. They can still be toggled in the interface.
+# Note, this will override the custom variable show_threshold of the object.
+disable_thresholds_rendering = "0"
 ```
 
 Note, the module respects the HTTP Header "Cache-Control" (no-cache) to disable the cache.

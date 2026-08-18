@@ -142,6 +142,12 @@ trait PerfdataChart
                     continue;
                 }
             }
+            if ($config['disable_thresholds_rendering']) {
+                // Note, this will override the custom variable show_threshold of the object.
+                // We do not intend to figure out here whether or not a custom var was set, this keeps
+                // the logic and the behaviour simple.
+                $dataset->setShowThresholds(false);
+            }
             $datasets[$dataset->getTitle()] = Json::sanitize($dataset);
         }
 

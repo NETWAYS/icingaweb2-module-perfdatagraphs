@@ -83,6 +83,14 @@ class PerfdataGraphsConfigForm extends ConfigForm
             'placeholder' => 900,
         ]);
 
+        $this->addElement('checkbox', 'perfdatagraphs_disable_thresholds_rendering', [
+            'label' => t('Disable warning and critical thresholds rendering by default'),
+            'description' => t('Disable rendering of warning and critical thresholds.' .
+                               ' They can still be toggled in the interface. Note, this will override the custom variable show_threshold of the object.'),
+            'value' => (bool) $this->config->get('perfdatagraphs', 'disable_thresholds_rendering', false),
+            'class' => 'autosubmit',
+        ]);
+
         $backends = $this->listBackends();
         $choose = ['' => sprintf(' - %s - ', t('Please choose'))];
 
