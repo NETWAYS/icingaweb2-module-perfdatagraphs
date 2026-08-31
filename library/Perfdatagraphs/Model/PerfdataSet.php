@@ -66,9 +66,7 @@ class PerfdataSet implements JsonSerializable
             $d['stroke'] = $this->stroke;
         }
 
-        if ($this->showThresholds === true) {
-            $d['show_thresholds'] = $this->showThresholds;
-        }
+        $d['show_thresholds'] = $this->showThresholds;
 
         if (!empty($this->timestamps)) {
             $d['timestamps'] = $this->timestamps;
