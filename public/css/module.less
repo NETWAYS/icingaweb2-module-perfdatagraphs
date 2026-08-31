@@ -14,6 +14,20 @@ Make the legend text more discreet
 }
 
 /*
+Hide the marker and reset padding for the time label so that the text aligns
+*/
+.u-series:first-child .u-marker {
+    display: none;
+}
+.u-series:first-child th {
+    padding: 0;
+}
+.u-title {
+    margin: .556em 0 0.333em;
+}
+
+
+/*
 We wanted to use Icinga Web's collapsible.js, however,
 since we fetch content after the page is loaded the
 collapsible.js event handler did not handle our content correctly.
