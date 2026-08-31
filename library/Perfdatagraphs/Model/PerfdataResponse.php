@@ -64,7 +64,7 @@ class PerfdataResponse implements JsonSerializable
     }
 
     /**
-     * isValid checks if this response contains data
+     * isEmpty checks if this response contains data
      *
      * @return bool
      */
@@ -156,12 +156,8 @@ class PerfdataResponse implements JsonSerializable
     {
         $d = [];
 
-        if (isset($this->errors)) {
-            $d['errors'] = $this->errors;
-        }
-        if (isset($this->data)) {
-            $d['data'] = array_values($this->data);
-        }
+        $d['errors'] = $this->errors;
+        $d['data'] = array_values($this->data);
 
         return $d;
     }

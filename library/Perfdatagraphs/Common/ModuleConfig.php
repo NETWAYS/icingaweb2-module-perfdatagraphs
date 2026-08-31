@@ -36,7 +36,7 @@ class ModuleConfig
      *
      * @return ?PerfdataSourceHook
      */
-    public static function getHook(Config $moduleConfig = null): ?PerfdataSourceHook
+    public static function getHook(?Config $moduleConfig = null): ?PerfdataSourceHook
     {
         // We just default to first hook we find.
         $default = Hook::first('perfdatagraphs/PerfdataSource');
@@ -69,7 +69,7 @@ class ModuleConfig
     /**
      * getConfig returns the module's configuration
      *
-     * @return array
+     * @return Config
      */
     public static function getConfig(): Config
     {
@@ -81,7 +81,7 @@ class ModuleConfig
      *
      * @return array
      */
-    public static function getConfigWithDefaults(Config $moduleConfig = null): array
+    public static function getConfigWithDefaults(?Config $moduleConfig = null): array
     {
         $default = [
             'cache_lifetime' => 900,

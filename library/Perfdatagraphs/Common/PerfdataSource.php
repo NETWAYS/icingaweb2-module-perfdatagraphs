@@ -73,6 +73,8 @@ class PerfdataSource
     }
 
     /**
+     * fetchViaHook makes the request and returns the PerfdataResponse from the hook
+     * @return PerfdataResponse
      */
     public function fetchViaHook(PerfdataRequest $request): PerfdataResponse
     {
