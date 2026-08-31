@@ -91,6 +91,14 @@ class PerfdataGraphsConfigForm extends ConfigForm
             'class' => 'autosubmit',
         ]);
 
+        $this->addElement('checkbox', 'perfdatagraphs_disable_objectview_graphs_rendering', [
+            'label' => t('Disable rendering graphs on object detail views'),
+            'description' => t('Disable rendering graphs on object detail views.' .
+                               ' Graphs can then only be viewed in their dedicated tab.'),
+            'value' => (bool) $this->config->get('perfdatagraphs', 'disable_objectview_graphs_rendering', false),
+            'class' => 'autosubmit',
+        ]);
+
         $backends = $this->listBackends();
         $choose = ['' => sprintf(' - %s - ', t('Please choose'))];
 

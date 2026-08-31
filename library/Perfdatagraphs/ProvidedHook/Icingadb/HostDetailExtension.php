@@ -29,6 +29,13 @@ class HostDetailExtension extends HostDetailExtensionHook
      */
     public function getHtmlForObject(Host $host): ValidHtml
     {
+        // Load the module's configuration.
+        $config = ModuleConfig::getConfigWithDefaults();
+
+        if ($config['disable_objectview_graphs_rendering']) {
+            return Html::tag('div');
+        }
+
         $serviceName = $host->checkcommand_name ?? '';
         $hostName = $host->name ?? '';
         $checkCommandName = $host->checkcommand_name ?? '';
@@ -67,8 +74,6 @@ class HostDetailExtension extends HostDetailExtensionHook
             $metricsToExclude = $customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE];
         }
 
-        // Load the module's configuration.
-        $config = ModuleConfig::getConfigWithDefaults();
         $duration = $config['default_timerange'];
         // When there is a parameter for the duration we use that instead.
         if (Url::fromRequest()->hasParam('perfdatagraphs.duration')) {
