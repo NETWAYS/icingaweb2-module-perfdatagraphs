@@ -19,6 +19,9 @@ cache_lifetime = 9000
 # Disable rendering of all warning and critical thresholds by default. They can still be toggled in the interface.
 # Note, this will override the custom variable show_threshold of the object.
 disable_thresholds_rendering = "0"
+
+# Disable rendering of graphs in the object detail view. Graphs can then only be viewed in their dedicated tab.
+disable_objectview_graphs_rendering = "0"
 ```
 
 Note, the module respects the HTTP Header "Cache-Control" (no-cache) to disable the cache.

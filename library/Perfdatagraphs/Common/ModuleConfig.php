@@ -88,6 +88,7 @@ class ModuleConfig
             'default_timerange' => 'PT12H',
             'minimum_chart_count' => 3,
             'disable_thresholds_rendering' => false,
+            'disable_objectview_graphs_rendering' => false,
         ];
 
         // Try to load the configuration
@@ -106,6 +107,7 @@ class ModuleConfig
         $config['minimum_chart_count'] = (int) $moduleConfig->get('perfdatagraphs', 'minimum_chart_count', $default['minimum_chart_count']);
         $config['default_timerange'] = $moduleConfig->get('perfdatagraphs', 'default_timerange', $default['default_timerange']);
         $config['disable_thresholds_rendering'] = (bool) $moduleConfig->get('perfdatagraphs', 'disable_thresholds_rendering', $default['disable_thresholds_rendering']);
+        $config['disable_objectview_graphs_rendering'] = (bool) $moduleConfig->get('perfdatagraphs', 'disable_objectview_graphs_rendering', $default['disable_objectview_graphs_rendering']);
 
         return $config;
     }

@@ -24,6 +24,13 @@ class DetailviewExtension extends DetailviewExtensionHook
 
     public function getHtmlForObject(MonitoredObject $object)
     {
+        // Load the module's configuration.
+        $config = ModuleConfig::getConfigWithDefaults();
+
+        if ($config['disable_objectview_graphs_rendering']) {
+            return Html::tag('div');
+        }
+
         $isHostCheck = false;
 
         if ($object instanceof Host) {
@@ -63,8 +70,6 @@ class DetailviewExtension extends DetailviewExtensionHook
             return $err;
         }
 
-        // Load the module's configuration.
-        $config = ModuleConfig::getConfigWithDefaults();
         $duration = $config['default_timerange'];
         // When there is a parameter for the duration we use that instead.
         if (Url::fromRequest()->hasParam('perfdatagraphs.duration')) {
