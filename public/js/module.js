@@ -54,7 +54,6 @@
                 }
             });
 
-            // TODO: The 'rendered' selectors might not yet be optimal.
             this.on('rendered', '#main > .icinga-module, #main > .container', this.rendered, this);
         }
 
@@ -551,7 +550,6 @@
                 return `${value.toFixed(2)} ms`;
             }
 
-            // TODO: Plurals could maybe be conditional
             if (Math.abs(n) < 60) {
                 return `${value.toFixed(2)} s`;
             }  else if (Math.abs(n) < 3600) {
