@@ -19,6 +19,11 @@
         // similar to the selected time range
         currentSeriesShow = {};
 
+        // Method to use to format datetime in the legend
+        legendFormat = new Intl.DateTimeFormat(undefined, {dateStyle: 'short', timeStyle: 'medium', timeZone: this.icinga.config.timezone}).format;
+        // Method to use to format datetime in the axis
+        axisFormat = new Intl.DateTimeFormat(navigator.language);
+
         constructor(icinga)
         {
             super(icinga);
@@ -139,7 +144,8 @@
             return {
                 stroke: axesColor,
                 grid: { stroke: axesColor, width: 0.5 },
-                // TODO: We should also format datetime here. But thats a bit more work
+                // TODO: We should also format datetime here. But thats a bit more work.
+                // See https://github.com/leeoniya/uPlot/tree/master/docs#axis--grid-opts
                 ticks: { stroke: axesColor, width: 0.5 }
             };
         }
@@ -184,17 +190,13 @@
          */
         getChartBaseOptions(elem)
         {
-            // Options for formatting datetime
-            const timezone = this.icinga.config.timezone;
-            const legendFormat = new Intl.DateTimeFormat(undefined, {dateStyle: 'short', timeStyle: 'medium', timeZone: timezone}).format;
-
             // The shared options for each chart. These
             // can then be combined with individual options e.g. the width.
             const opts = {
                 cursor: { sync: { key: 0, setSeries: true } },
-                tzDate: ts => uPlot.tzDate(new Date(ts * 1e3), timezone),
+                tzDate: ts => uPlot.tzDate(new Date(ts * 1e3), this.icinga.config.timezone),
                 fmtDate: tpl => {
-                    const tplNew = this.fmtDate(tpl, navigator.language);
+                    const tplNew = this.fmtDate(tpl);
                     return uPlot.fmtDate(tplNew)
                 },
                 scales: {
@@ -224,7 +226,7 @@
                 // labels & value display in the legend
                 series: [
                     {
-                        value: (u, ts) => ts == null ? '' : legendFormat(uPlot.tzDate(new Date(ts * 1e3), timezone))
+                        value: (u, ts) => ts == null ? '' : this.legendFormat(uPlot.tzDate(new Date(ts * 1e3), this.icinga.config.timezone))
                     }
                 ],
                 hooks: {
@@ -417,10 +419,9 @@
          * DMY, the cool YMD or the whatever MDY is.
          * We use this when rendering the time in the plots axis
          */
-        fmtDate(tpl, locale) {
-            const formatter = new Intl.DateTimeFormat(locale);
+        fmtDate(tpl) {
             // Note, A bit static, but works for now
-            const parts = formatter.formatToParts(new Date(2024, 0, 2));
+            const parts = this.axisFormat.formatToParts(new Date(2024, 0, 2));
             // This is generally not optimal but should work for now
             const dateOrder = parts
                   .filter(p => ['day', 'month', 'year'].includes(p.type))
@@ -523,9 +524,6 @@
 
         /**
          * formatSeconds turns the number of seconds into a time format
-         * TODO: Maybe we should have a helper function that calculates the
-         * required number of decimals. Because fixed decimals may not
-         * help to distinquish certains values.
          */
         formatTimeSeconds(n)
         {
