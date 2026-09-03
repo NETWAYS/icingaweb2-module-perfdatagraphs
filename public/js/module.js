@@ -454,7 +454,7 @@
                 tplNew = tplNew
                     .replace('{M}/{D}/{YY}', '{MMM} {D} {YY}')
                     .replace('{M}/{D}', '{MMM} {D}')
-                    .replace('{M}/{D}\n{YY}', '{D} {MMM}\n{YY}')
+                    .replace('{M}/{D}\n{YY}', '{MMM} {D}\n{YY}')
                 break;
             }
 
