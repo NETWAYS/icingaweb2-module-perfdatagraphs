@@ -39,7 +39,6 @@ trait PerfdataChart
     {
         // Since there might be whatever in the names.
         // We use a faster non-cryptographic hash, since we don't do crypto here, we just need stable names here.
-        // In the future we should switch to an xxHash algorithm, I wanted to keep PHP8.0 compatibility for now.
         return hash('xxh128', sprintf('%s-%s-%s', $hostName, $serviceName, $checkCommandName));
     }
 

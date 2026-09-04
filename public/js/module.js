@@ -10,7 +10,8 @@
 
     class Perfdatagraphs extends Icinga.EventListener {
         // plots contains the chart objects with the element ID where it is rendered as key.
-        // Used for resizing the charts.
+        // Used for resizing the charts. Note: Maybe we can also use this to not recreate the plots?
+        // Since we have a unique identifier for the DOM element in which each plot is rendered.
         plots = new Map();
         // Where we store data in between autorefresh
         currentSelect = null;

@@ -98,7 +98,7 @@ class Tab extends TabHook
             $metricsToExclude = $customvars[$cvh::CUSTOM_VAR_CONFIG_EXCLUDE];
         }
 
-        $source = new PerfdataSource($config, $hook);
+        $source = new PerfdataSource(config: $config, hook: $hook);
         $perfRequest = new PerfdataRequest(
             hostName: $hostName,
             serviceName: $serviceName,
