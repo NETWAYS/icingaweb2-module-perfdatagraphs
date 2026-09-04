@@ -11,7 +11,7 @@ use Icinga\Application\Hook;
 use Exception;
 
 /**
- * ModuelConfig is a helper class to safely access this module's configuration.
+ * ModuleConfig is a helper class to safely access this module's configuration.
  */
 class ModuleConfig
 {
@@ -58,7 +58,7 @@ class ModuleConfig
         // See if we can find the configured hook in the available hooks
         // If not then we return the first we find, which could still be none
         foreach ($hooks as $hook) {
-            if (mb_strtolower($configuredHookName) === mb_strtolower($hook->getName())) {
+            if (strtolower($configuredHookName) === strtolower($hook->getName())) {
                 return $hook;
             }
         }
