@@ -17,6 +17,11 @@ class PerfdataCache extends FileCache
     */
     public function clearAll(): void
     {
+        // Probably not gonna happen but why not
+        if (!is_dir($this->basedir)) {
+            return;
+        }
+
         $iterator = new FilesystemIterator($this->basedir);
         foreach ($iterator as $file) {
             if (!$file->isFile()) {

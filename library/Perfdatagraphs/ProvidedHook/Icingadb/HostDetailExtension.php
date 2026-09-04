@@ -80,7 +80,7 @@ class HostDetailExtension extends HostDetailExtensionHook
             $duration = Url::fromRequest()->getParam('perfdatagraphs.duration');
         }
 
-        $source = new PerfdataSource($config, $hook);
+        $source = new PerfdataSource(config: $config, hook: $hook);
         $request = new PerfdataRequest(
             hostName: $hostName,
             serviceName: $serviceName,
