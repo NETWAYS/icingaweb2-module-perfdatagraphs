@@ -21,7 +21,8 @@
         currentSeriesShow = {};
 
         // Method to use to format datetime in the legend
-        legendFormat = new Intl.DateTimeFormat(undefined, {dateStyle: 'short', timeStyle: 'medium', timeZone: this.icinga.config.timezone}).format;
+        legendFormat = new Intl.DateTimeFormat(navigator.language, {dateStyle: 'short', timeStyle: 'medium'}).format;
+
         // Method to use to format datetime in the axis
         axisFormat = new Intl.DateTimeFormat(navigator.language);
 
@@ -195,6 +196,7 @@
             // can then be combined with individual options e.g. the width.
             const opts = {
                 cursor: { sync: { key: 0, setSeries: true } },
+                // tzDate configures the timeszone for timestamps in the the x-axis
                 tzDate: ts => uPlot.tzDate(new Date(ts * 1e3), this.icinga.config.timezone),
                 fmtDate: tpl => {
                     const tplNew = this.fmtDate(tpl);
