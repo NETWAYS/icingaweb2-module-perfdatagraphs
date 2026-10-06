@@ -2,6 +2,10 @@
 
 ## v1.1.0
 
+- Fix timezone in plot legend
+
+## v1.1.0
+
 - Add option to disable threshold rendering by default
 - Add option to disable graph rendering on object detail page
 - Small CSS normalizations (adjust text in graph legend)
